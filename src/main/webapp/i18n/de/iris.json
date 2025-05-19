@@ -1,0 +1,159 @@
+{
+    "artemisApp": {
+        "iris": {
+            "settings": {
+                "success": "Iris Einträge erfolgreich gespeichert",
+                "error": {
+                    "save": "Fehler beim Speichern der Iris Einstellungen",
+                    "noSettings": "Iris Einstellungen konnten nicht geladen werden. Bitte kontaktiere einen Administrator, wenn das Problem weiterhin besteht."
+                },
+                "button": {
+                    "reload": "Einstellungen neu laden",
+                    "save": "Einstellungen speichern",
+                    "textExercise": {
+                        "title": "Iris",
+                        "tooltip": "Bearbeite die Iris Einstellungen für diese Textaufgabe"
+                    },
+                    "programmingExercise": {
+                        "title": "Iris",
+                        "tooltip": "Bearbeite die Iris Einstellungen für diese Programmieraufgabe"
+                    },
+                    "course": {
+                        "title": "Iris",
+                        "tooltip": "Bearbeite die Iris Einstellungen für diesen Kurs"
+                    },
+                    "lecture": {
+                        "title": "Iris",
+                        "tooltip": "Bearbeite die Iris Einstellungen für diese Vorlesung"
+                    }
+                },
+                "subSettings": {
+                    "exerciseChatSettings": "Programmieraufgaben Chat Einstellungen",
+                    "textExerciseChatSettings": "Textaufgaben Chat Einstellungen",
+                    "lectureChatSettings": "Vorlesungschat Einstellungen",
+                    "courseChatSettings": "Kurs Chat Einstellungen",
+                    "lectureIngestionSettings": {
+                        "title": "Einstellungen zur Vorlesungsverarbeitung",
+                        "autoIngestOnAttachmentUpload": "Vorlesungen automatisch senden"
+                    },
+                    "faqIngestionSettings": {
+                        "title": "Einstellungen zur FAQ-Verarbeitung",
+                        "autoIngest": "FAQs automatisch an Iris senden"
+                    },
+                    "competencyGenerationSettings": "Kompetenzgenerierung Einstellungen",
+                    "tutorSuggestionSettings": "Tutor Vorschlag Einstellungen",
+                    "proactivityBuildFailedEventEnabled": {
+                        "label": "Build-Fehler überwachen",
+                        "tooltip": "Wenn aktiviert, wird Iris proaktiv Hilfe-Nachrichten senden, wenn der Build einer Abbgabe fehlschlägt."
+                    },
+                    "proactivityProgressStalledEventEnabled": {
+                        "label": "Übungsleistung überwachen",
+                        "tooltip": "Wenn aktiviert, wird Iris proaktiv Hilfe-Nachrichten senden, wenn sich die Übungsleistung des Studenten nicht verbessert."
+                    },
+                    "proactivitySettings": {
+                        "title": "Proaktivitätseinstellungen",
+                        "tooltip": "Aktiviere die untenstehenden Optionen, damit Iris proaktiv Studierende kontaktiert, wenn bestimmte Bedingungen erfüllt sind.",
+                        "parentDisabled": "Iris sendet keine proaktiven Nachrichten für diese Option, da entweder die Option selbst, oder Iris in den aktuellen oder übergeordneten Einstellungen deaktiviert ist."
+                    },
+                    "enabled-disabled": "Aktiviert/Deaktiviert",
+                    "enabledForCategories": "Automatisch aktivieren für Kategorien",
+                    "variants": {
+                        "title": "Varianten",
+                        "allowedVariants": {
+                            "title": "Erlaubte Varianten",
+                            "inheritSwitch": "Erbe erlaubte Varianten"
+                        },
+                        "selectedVariant": {
+                            "title": "Genuzte Variante",
+                            "inherit": "Erben"
+                        }
+                    },
+                    "rateLimit": "Rate Limit",
+                    "rateLimitTooltip": "Die maximale Anzahl an Antworten, die ein Benutzer vom LLM in einem bestimmten Zeitraum erhalten kann.",
+                    "rateLimitTimeframeHours": "Rate Limit Zeitrahmen (Stunden)",
+                    "rateLimitTimeframeHoursTooltip": "Der Zeitraum, in welchem das Rate Limit angewendet wird, in Stunden.",
+                    "template": {
+                        "title": "Template",
+                        "inherit": "Template erben"
+                    },
+                    "enabled": {
+                        "on": "Aktiviert",
+                        "off": "Deaktiviert",
+                        "custom": "Benutzerdefiniert",
+                        "chat": "Iris Chat"
+                    },
+                    "disabled": {
+                        "course": "IRIS ist in den Kurs-IRIS-Einstellungen deaktiviert",
+                        "global": "IRIS ist in den globalen IRIS-Einstellungen deaktiviert"
+                    },
+                    "customInstructions": {
+                        "title": "Benutzerdefinierte Anweisungen",
+                        "description": "Benutzerdefinierte Anweisungen, die der KI beim Generieren von Antworten zur Verfügung gestellt werden.",
+                        "placeholder": "Gib benutzerdefinierte Anweisungen für die KI ein (maximal 2048 Zeichen)"
+                    }
+                },
+                "title": {
+                    "breadcrumb": "Iris Einstellungen",
+                    "global": "Globale Iris Einstellungen",
+                    "course": "Kurs Iris Einstellungen",
+                    "exercise": "Programmieraufgabe Iris Einstellungen"
+                }
+            },
+            "error": {
+                "forbidden": "Artemis ist nicht konfiguriert, um Iris zu verwenden. (Ungültiges Token)",
+                "internalPyrisError": "Ein interner Fehler beim Kommunizieren mit dem LLM ist aufgetreten. Die Fehlermeldung lautet: {{ pyrisErrorMessage }}.",
+                "invalidTemplate": "Die Vorlage ist ungültig. Die Fehlermeldung lautet: {{ pyrisErrorMessage }}.",
+                "noVariantAvailable": "Die Variante {{ variant }} steht nicht zur Verfügung. Bitte kontaktiere einen Administrator, wenn das Problem weiterhin besteht.",
+                "noResponse": "Es wurde keine Antwort von Iris empfangen. Bitte kontaktiere einen Administrator, wenn das Problem weiterhin besteht.",
+                "parseResponse": "Ein Fehler ist beim Parsen der Antwort von Iris aufgetreten. Ursache: {{ cause }}"
+            },
+            "chat": {
+                "helpOffer": "Wie kann ich Dir helfen?"
+            },
+            "tutorSuggestion": {
+                "loading": "Lade Vorschläge...",
+                "noIris": "Iris ist derzeit nicht verfügbar."
+            },
+            "chatBubble": {
+                "seeFull": "Vollständige Nachricht sehen"
+            },
+            "ingestionStates": {
+                "loading": "Wird geladen...",
+                "notStarted": "Nicht gestartet",
+                "inProgress": "In Bearbeitung",
+                "done": "Abgeschlossen",
+                "error": "Fehler",
+                "partiallyIngested": "Teilweise verarbeitet"
+            },
+            "ingestionAlert": {
+                "lectureUnitSuccess": "Vorlesungseinheit wird in Iris verarbeitet",
+                "lectureUnitError": "Fehler beim Senden der Vorlesungseinheit an Iris",
+                "lectureSuccess": "Vorlesung wird in Iris verarbeitet",
+                "lectureError": "Fehler beim Senden der Vorlesung an Iris",
+                "allLecturesSuccess": "Alle Vorlesungen werden nun verarbeitet",
+                "allFaqsSuccess": "Alle Faqs werden in Iris verarbeitet",
+                "allLecturesError": "Fehler beim Senden aller Vorlesungen an Iris",
+                "allFaqsError": "Fehler beim Senden aller FAQs an Iris",
+                "lectureNotFound": "Vorlesung kann nicht an Iris gesendet werden, keine Vorlesung mit der angegebenen ID gefunden.",
+                "pyrisUnavailable": "Iris ist derzeit nicht verfügbar.",
+                "pyrisError": "Ein Fehler ist bei der Kommunikation mit Iris aufgetreten.",
+                "transcriptionIngestionError": "Fehler beim Senden einer Vorlesungstranskription"
+            },
+            "controlCenter": {
+                "tooltip": "Durch das Umschalten aktivierst oder deaktivierst du ALLE Iris Features für diesen Kurs. Für eine gezieltere Kontrolle nutze bitte die Iris Einstellungen, indem du auf Benutzerdefinierst klickst."
+            },
+            "chatHistory": {
+                "title": "Chats",
+                "today": "Heute",
+                "yesterday": "Gestern",
+                "last7Days": "Letzten 7 Tage",
+                "last30Days": "Letzten 30 Tage",
+                "older": "Älter",
+                "relatedEntityTooltip": {
+                    "programmingExercise": "Diese Konversation bezieht sich auf eine Programmieraufgabe.",
+                    "lecture": "Diese Konversation bezieht sich auf eine Vorlesung."
+                }
+            }
+        }
+    }
+}

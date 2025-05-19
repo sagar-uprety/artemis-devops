@@ -1,0 +1,45 @@
+{
+    "health": {
+        "title": "Health Checks",
+        "refresh.button": "Refresh",
+        "stacktrace": "Stacktrace",
+        "details": {
+            "details": "Details",
+            "properties": "Properties",
+            "name": "Name",
+            "value": "Value",
+            "error": "Error"
+        },
+        "indicator": {
+            "clientConfigServer": "Client Config Server",
+            "discoveryComposite": "Discovery Composite",
+            "refreshScope": "Microservice Refresh Scope",
+            "configServer": "Microservice Config Server",
+            "hystrix": "Hystrix",
+            "diskSpace": "Disk space",
+            "mail": "Email",
+            "db": "Database",
+            "ping": "Ping",
+            "livenessState": "Liveness",
+            "readinessState": "Readiness",
+            "continuousIntegrationServer": "Continuous Integration Server",
+            "versionControlServer": "Version Control Server",
+            "hazelcast": "Hazelcast",
+            "websocketBroker": "Websocket Broker (Server -> Broker)",
+            "athena": "Athena",
+            "apollon": "Apollon Conversion Server",
+            "pyris": "Pyris",
+            "ssl": "SSL",
+            "hermes": "Hermes Push Notifications"
+        },
+        "table": {
+            "service": "Service name",
+            "status": "Status"
+        },
+        "status": {
+            "UNKNOWN": "UNKNOWN",
+            "UP": "UP",
+            "DOWN": "DOWN"
+        }
+    }
+}

@@ -1,0 +1,77 @@
+<div>
+    <div class="d-flex align-items-center gap-2">
+        @if (!isImportFromExistingExercise && !isImportFromFile && !programmingExercise.id) {
+            <h2 id="jhi-programming-exercise-heading-create" jhiTranslate="artemisApp.programmingExercise.home.createLabel"></h2>
+        } @else if (!isImportFromExistingExercise && programmingExercise.id) {
+            <h2 id="jhi-programming-exercise-heading-edit" jhiTranslate="artemisApp.programmingExercise.home.editLabel"></h2>
+        } @else if (isImportFromExistingExercise || isImportFromFile) {
+            <h2 id="jhi-programming-exercise-heading-import" jhiTranslate="artemisApp.programmingExercise.home.importLabel"></h2>
+        }
+        <jhi-documentation-button [type]="documentationType" />
+    </div>
+    <jhi-form-status-bar [formStatusSections]="formStatusSections()" />
+    <form name="editForm" role="form" novalidate #editForm="ngForm" (keydown.enter)="isEventInsideTextArea($event)">
+        <div class="update-programming-exercise">
+            <jhi-programming-exercise-info
+                [programmingExercise]="programmingExercise"
+                [programmingExerciseCreationConfig]="getProgrammingExerciseCreationConfig()"
+                [isExamMode]="isExamMode"
+                [isImport]="isImportFromExistingExercise || isImportFromFile"
+                [importOptions]="importOptions"
+                [isSimpleMode]="isSimpleMode()"
+                [isEditFieldDisplayedRecord]="isEditFieldDisplayedRecord()"
+                [courseId]="courseId"
+                [(isAuxiliaryRepositoryInputValid)]="isAuxiliaryRepositoryInputValid"
+            />
+            <hr class="mb-5" />
+            @if (!isSimpleMode()) {
+                <!-- The mode section would only contain the difficulty in the simple mode,
+                in the simple mode the difficulty will be part of the general section -->
+                <jhi-programming-exercise-mode
+                    [programmingExercise]="programmingExercise"
+                    [programmingExerciseCreationConfig]="getProgrammingExerciseCreationConfig()"
+                    [isEditFieldDisplayedRecord]="isEditFieldDisplayedRecord()"
+                    (triggerValidation)="calculateFormStatusSections()"
+                />
+                <hr class="mb-5" />
+            }
+            <jhi-programming-exercise-language
+                [programmingExercise]="programmingExercise"
+                [programmingExerciseCreationConfig]="getProgrammingExerciseCreationConfig()"
+                [isEditFieldDisplayedRecord]="isEditFieldDisplayedRecord()"
+            />
+            <hr class="mb-5" />
+            <jhi-programming-exercise-problem
+                [(exercise)]="programmingExercise"
+                [programmingExerciseCreationConfig]="getProgrammingExerciseCreationConfig()"
+                [isEditFieldDisplayedRecord]="isEditFieldDisplayedRecord()"
+                (problemStatementChange)="calculateFormStatusSections()"
+            />
+            <hr class="mb-5" />
+            <jhi-programming-exercise-grading
+                class="form-step"
+                [programmingExercise]="programmingExercise"
+                [programmingExerciseCreationConfig]="getProgrammingExerciseCreationConfig()"
+                [importOptions]="importOptions"
+                [isEditFieldDisplayedRecord]="isEditFieldDisplayedRecord()"
+            />
+            @if (isEditFieldDisplayedRecord().plagiarismControl && !isExamMode) {
+                <jhi-feature-overlay [enabled]="plagiarismEnabled" placement="right">
+                    <jhi-exercise-update-plagiarism [(exercise)]="programmingExercise" />
+                </jhi-feature-overlay>
+            }
+            <jhi-form-footer
+                [isCreation]="!programmingExercise.id"
+                [isImport]="isImportFromExistingExercise || isImportFromFile"
+                [isSaving]="isSaving"
+                [(notificationText)]="notificationText"
+                [isSimpleMode]="isSimpleMode()"
+                [switchEditMode]="switchEditMode"
+                [areAuxiliaryRepositoriesValid]="isAuxiliaryRepositoryInputValid()"
+                [invalidReasons]="getInvalidReasons()"
+                (save)="save()"
+                (onCancel)="previousState()"
+            />
+        </div>
+    </form>
+</div>

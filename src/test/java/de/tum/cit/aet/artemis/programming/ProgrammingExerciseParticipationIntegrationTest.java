@@ -1,0 +1,1033 @@
+package de.tum.cit.aet.artemis.programming;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Stream;
+
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.NoHeadException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+
+import de.tum.cit.aet.artemis.assessment.domain.AssessmentType;
+import de.tum.cit.aet.artemis.assessment.domain.Feedback;
+import de.tum.cit.aet.artemis.assessment.domain.Result;
+import de.tum.cit.aet.artemis.exam.domain.Exam;
+import de.tum.cit.aet.artemis.exercise.domain.Submission;
+import de.tum.cit.aet.artemis.exercise.domain.participation.Participation;
+import de.tum.cit.aet.artemis.exercise.domain.participation.StudentParticipation;
+import de.tum.cit.aet.artemis.exercise.participation.util.ParticipationFactory;
+import de.tum.cit.aet.artemis.exercise.util.ExerciseUtilService;
+import de.tum.cit.aet.artemis.programming.domain.ProgrammingExercise;
+import de.tum.cit.aet.artemis.programming.domain.ProgrammingExerciseParticipation;
+import de.tum.cit.aet.artemis.programming.domain.ProgrammingExerciseStudentParticipation;
+import de.tum.cit.aet.artemis.programming.domain.ProgrammingSubmission;
+import de.tum.cit.aet.artemis.programming.domain.Repository;
+import de.tum.cit.aet.artemis.programming.domain.SolutionProgrammingExerciseParticipation;
+import de.tum.cit.aet.artemis.programming.domain.TemplateProgrammingExerciseParticipation;
+import de.tum.cit.aet.artemis.programming.domain.VcsRepositoryUri;
+import de.tum.cit.aet.artemis.programming.dto.CommitInfoDTO;
+import de.tum.cit.aet.artemis.programming.dto.RepoNameProgrammingStudentParticipationDTO;
+
+class ProgrammingExerciseParticipationIntegrationTest extends AbstractProgrammingIntegrationIndependentTest {
+
+    private static final String TEST_PREFIX = "programmingexerciseparticipation";
+
+    private final String participationsBaseUrl = "/api/programming/programming-exercise-participations/";
+
+    private final String exercisesBaseUrl = "/api/programming/programming-exercises/";
+
+    private ProgrammingExercise programmingExercise;
+
+    private Participation programmingExerciseParticipation;
+
+    @BeforeEach
+    void initTestCase() {
+        userUtilService.addUsers(TEST_PREFIX, 4, 2, 0, 2);
+        var course = programmingExerciseUtilService.addCourseWithOneProgrammingExerciseAndTestCases();
+        programmingExercise = ExerciseUtilService.getFirstExerciseWithType(course, ProgrammingExercise.class);
+        programmingExercise = programmingExerciseRepository.findWithEagerStudentParticipationsById(programmingExercise.getId()).orElseThrow();
+        programmingExerciseIntegrationTestService.addAuxiliaryRepositoryToExercise(programmingExercise);
+    }
+
+    private static Stream<Arguments> argumentsForGetParticipationResults() {
+        ZonedDateTime startDate = ZonedDateTime.now().minusDays(3);
+        ZonedDateTime releaseDate = ZonedDateTime.now().minusDays(4);
+        ZonedDateTime someDate = ZonedDateTime.now();
+        ZonedDateTime futureDate = ZonedDateTime.now().plusDays(3);
+        ZonedDateTime pastDate = ZonedDateTime.now().minusDays(1);
+        return Stream.of(
+                // No assessmentType and no completionDate -> notFound
+                Arguments.of(null, null, null, null, null, false),
+                // Automatic result is always returned
+                Arguments.of(startDate, releaseDate, AssessmentType.AUTOMATIC, null, null, true),
+                Arguments.of(startDate, releaseDate, AssessmentType.AUTOMATIC, someDate, null, true),
+                Arguments.of(startDate, releaseDate, AssessmentType.AUTOMATIC, someDate, futureDate, true),
+                Arguments.of(startDate, releaseDate, AssessmentType.AUTOMATIC, someDate, pastDate, true),
+                Arguments.of(startDate, releaseDate, AssessmentType.AUTOMATIC, null, futureDate, true),
+                Arguments.of(startDate, releaseDate, AssessmentType.AUTOMATIC, null, pastDate, true),
+                // Manual result without completion date (assessment was only saved but no submitted) is not returned
+                Arguments.of(startDate, releaseDate, AssessmentType.SEMI_AUTOMATIC, null, null, false),
+                Arguments.of(startDate, releaseDate, AssessmentType.SEMI_AUTOMATIC, null, futureDate, false),
+                Arguments.of(startDate, releaseDate, AssessmentType.SEMI_AUTOMATIC, null, pastDate, false),
+                // Manual result is not returned if completed and assessment due date has not passed
+                Arguments.of(startDate, releaseDate, AssessmentType.SEMI_AUTOMATIC, someDate, futureDate, false),
+                // Manual result is returned if completed and assessmentDue date has passed
+                Arguments.of(startDate, releaseDate, AssessmentType.SEMI_AUTOMATIC, someDate, pastDate, true));
+    }
+
+    @ParameterizedTest(name = "{displayName} [{index}] {argumentsWithNames}")
+    @MethodSource("argumentsForGetParticipationResults")
+    @WithMockUser(username = TEST_PREFIX + "student1", roles = "USER")
+    void testGetParticipationWithLatestResultAsAStudent(ZonedDateTime startDate, ZonedDateTime releaseDate, AssessmentType assessmentType, ZonedDateTime completionDate,
+            ZonedDateTime assessmentDueDate, boolean expectLastCreatedResult) throws Exception {
+        programmingExercise.setStartDate(startDate);
+        programmingExercise.setReleaseDate(releaseDate);
+        programmingExercise.setAssessmentDueDate(assessmentDueDate);
+        programmingExerciseRepository.save(programmingExercise);
+        var result = addStudentParticipationWithResult(assessmentType, completionDate);
+        StudentParticipation participation = (StudentParticipation) result.getSubmission().getParticipation();
+        var requestedParticipation = request.get(participationsBaseUrl + participation.getId() + "/student-participation-with-latest-result-and-feedbacks", HttpStatus.OK,
+                ProgrammingExerciseStudentParticipation.class);
+        if (expectLastCreatedResult) {
+            Set<Result> results = participationUtilService.getResultsForParticipation(requestedParticipation);
+            assertThat(results).hasSize(1);
+            var requestedResult = results.iterator().next();
+            assertThat(requestedResult.getFeedbacks()).noneMatch(Feedback::isInvisible);
+        }
+    }
+
+    @ParameterizedTest(name = "{displayName} [{index}] {argumentsWithNames}")
+    @MethodSource("argumentsForGetParticipationResults")
+    @WithMockUser(username = TEST_PREFIX + "student1", roles = "USER")
+    void testGetParticipationWithLatestResult_multipleResultsAvailable(ZonedDateTime startDate, ZonedDateTime releaseDate, AssessmentType assessmentType,
+            ZonedDateTime completionDate, ZonedDateTime assessmentDueDate, boolean expectLastCreatedResult) throws Exception {
+        programmingExercise.setStartDate(startDate);
+        programmingExercise.setReleaseDate(releaseDate);
+        // Add an automatic result first
+        var firstResult = addStudentParticipationWithResult(AssessmentType.AUTOMATIC, null);
+        programmingExercise.setAssessmentDueDate(assessmentDueDate);
+        programmingExerciseRepository.save(programmingExercise);
+        // Add a parameterized second result
+        StudentParticipation participation = (StudentParticipation) firstResult.getSubmission().getParticipation();
+        Result secondResult = participationUtilService.addResultToSubmission(participation, participation.getSubmissions().iterator().next());
+        secondResult.successful(true).rated(true).score(100D).assessmentType(assessmentType).completionDate(completionDate);
+        secondResult = participationUtilService.addVariousVisibilityFeedbackToResult(secondResult);
+        var requestedParticipation = request.get(participationsBaseUrl + participation.getId() + "/student-participation-with-latest-result-and-feedbacks", HttpStatus.OK,
+                ProgrammingExerciseStudentParticipation.class);
+
+        Set<Result> results = participationUtilService.getResultsForParticipation(requestedParticipation);
+        assertThat(results).hasSize(1);
+        var requestedResult = results.iterator().next();
+
+        assertThat(requestedResult.getFeedbacks()).noneMatch(Feedback::isInvisible);
+        assertThat(requestedResult.getFeedbacks()).noneMatch(Feedback::isAfterDueDate);
+
+        // Depending on the parameters we expect to get the first or the second created result from the server
+        if (expectLastCreatedResult) {
+            assertThat(requestedResult).isEqualTo(secondResult);
+        }
+        else {
+            firstResult.filterSensitiveInformation();
+            firstResult.filterSensitiveFeedbacks(true);
+            assertThat(requestedResult).isEqualTo(firstResult);
+        }
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "student4", roles = "USER")
+    void testGetParticipationWithLatestResult_cannotAccessParticipation() throws Exception {
+        // student4 should have no connection to student1's participation and should thus receive a Forbidden HTTP status.
+        ProgrammingExerciseStudentParticipation participation = participationUtilService.addStudentParticipationForProgrammingExercise(programmingExercise,
+                TEST_PREFIX + "student1");
+        request.get(participationsBaseUrl + participation.getId() + "/student-participation-with-latest-result-and-feedbacks", HttpStatus.FORBIDDEN,
+                ProgrammingExerciseStudentParticipation.class);
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "student1", roles = "USER")
+    void testGetParticipationWithLatestResult_studentCannotAccessParticipationIfExerciseNotStarted() throws Exception {
+        ZonedDateTime startDate = ZonedDateTime.now().plusDays(1);
+        programmingExercise.setStartDate(startDate);
+        programmingExerciseRepository.save(programmingExercise);
+        ProgrammingExerciseStudentParticipation participation = participationUtilService.addStudentParticipationForProgrammingExercise(programmingExercise,
+                TEST_PREFIX + "student1");
+        request.get(participationsBaseUrl + participation.getId() + "/student-participation-with-latest-result-and-feedbacks", HttpStatus.FORBIDDEN,
+                ProgrammingExerciseStudentParticipation.class);
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "tutor1", roles = "TA")
+    void testGetParticipationWithLatestResult_canAccessParticipationIfExerciseNotStartedAndNotStudent() throws Exception {
+        ZonedDateTime startDate = ZonedDateTime.now().plusDays(1);
+        programmingExercise.setStartDate(startDate);
+        programmingExerciseRepository.save(programmingExercise);
+        ProgrammingExerciseStudentParticipation participation = participationUtilService.addStudentParticipationForProgrammingExercise(programmingExercise,
+                TEST_PREFIX + "student1");
+        request.get(participationsBaseUrl + participation.getId() + "/student-participation-with-latest-result-and-feedbacks", HttpStatus.OK,
+                ProgrammingExerciseStudentParticipation.class);
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "student1", roles = "USER")
+    void testGetParticipationWithLatestResult_showsResultsDuringExam() throws Exception {
+        var result = setupExamExerciseWithParticipationAndResult(1, TEST_PREFIX + "student1");
+        StudentParticipation participation = (StudentParticipation) result.getSubmission().getParticipation();
+        var requestedParticipation = request.get(participationsBaseUrl + participation.getId() + "/student-participation-with-latest-result-and-feedbacks", HttpStatus.OK,
+                ProgrammingExerciseStudentParticipation.class);
+        assertThat(participationUtilService.getResultsForParticipation(requestedParticipation)).hasSize(1);
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "student1", roles = "USER")
+    void testGetParticipationWithLatestResult_afterExam_hidesResultsBeforeExamResultsPublished() throws Exception {
+        var result = setupExamExerciseWithParticipationAndResult(4, TEST_PREFIX + "student1");
+        StudentParticipation participation = (StudentParticipation) result.getSubmission().getParticipation();
+        var requestedParticipation = request.get(participationsBaseUrl + participation.getId() + "/student-participation-with-latest-result-and-feedbacks", HttpStatus.OK,
+                ProgrammingExerciseStudentParticipation.class);
+        assertThat(participationUtilService.getResultsForParticipation(requestedParticipation)).isEmpty();
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "student1", roles = "USER")
+    void testGetParticipationWithLatestResult_showsResultsAfterExamResultsPublished() throws Exception {
+        var result = setupExamExerciseWithParticipationAndResult(10, TEST_PREFIX + "student1");
+        StudentParticipation participation = (StudentParticipation) result.getSubmission().getParticipation();
+        var requestedParticipation = request.get(participationsBaseUrl + participation.getId() + "/student-participation-with-latest-result-and-feedbacks", HttpStatus.OK,
+                ProgrammingExerciseStudentParticipation.class);
+        assertThat(participationUtilService.getResultsForParticipation(requestedParticipation)).hasSize(1);
+    }
+
+    @ParameterizedTest(name = "{displayName} [{index}] {argumentsWithNames}")
+    @MethodSource("argumentsForGetParticipationResults")
+    @WithMockUser(username = TEST_PREFIX + "student1", roles = "USER")
+    void testGetParticipationWithAllResults(ZonedDateTime startDate, ZonedDateTime releaseDate, AssessmentType assessmentType, ZonedDateTime completionDate,
+            ZonedDateTime assessmentDueDate, boolean expectLastCreatedResult) throws Exception {
+        programmingExercise.setStartDate(startDate);
+        programmingExercise.setReleaseDate(releaseDate);
+        // Add an automatic result first
+        var firstResult = addStudentParticipationWithResult(AssessmentType.AUTOMATIC, null);
+        programmingExercise.setAssessmentDueDate(assessmentDueDate);
+        programmingExerciseRepository.save(programmingExercise);
+        // Add another automatic result
+        var secondResult = addStudentParticipationWithResult(AssessmentType.AUTOMATIC, null);
+        programmingExercise.setAssessmentDueDate(assessmentDueDate);
+        programmingExerciseRepository.save(programmingExercise);
+        // Add a parameterized third result
+        Result thirdResult = addStudentParticipationWithResult(assessmentType, completionDate);
+        StudentParticipation participation = (StudentParticipation) thirdResult.getSubmission().getParticipation();
+
+        // Expect the request to always be ok because it should at least return the first automatic result
+        var requestedParticipation = request.get(participationsBaseUrl + participation.getId() + "/student-participation-with-all-results", HttpStatus.OK,
+                ProgrammingExerciseStudentParticipation.class);
+        Set<Result> results = participationUtilService.getResultsForParticipation(requestedParticipation);
+        if (expectLastCreatedResult) {
+            assertThat(results).hasSize(3);
+        }
+        else {
+            assertThat(results).hasSize(2);
+        }
+        for (var result : results) {
+            assertThat(result.getFeedbacks()).noneMatch(Feedback::isInvisible);
+            assertThat(result.getFeedbacks()).noneMatch(Feedback::isAfterDueDate);
+        }
+        firstResult.filterSensitiveInformation();
+        firstResult.filterSensitiveFeedbacks(true);
+        assertThat(results).contains(firstResult);
+        secondResult.filterSensitiveInformation();
+        secondResult.filterSensitiveFeedbacks(true);
+        assertThat(results).contains(secondResult);
+
+        // Depending on the parameters we expect to get the third result too
+        if (expectLastCreatedResult) {
+            assertThat(results).contains(thirdResult);
+        }
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "instructor1", roles = "INSTRUCTOR")
+    void testGetParticipationWithAllResultsAsAnInstructor_noCompletionDate_notFound() throws Exception {
+        var result = addStudentParticipationWithResult(AssessmentType.SEMI_AUTOMATIC, null);
+        StudentParticipation participation = (StudentParticipation) result.getSubmission().getParticipation();
+        request.get(participationsBaseUrl + participation.getId() + "/student-participation-with-all-results", HttpStatus.NOT_FOUND, ProgrammingExerciseStudentParticipation.class);
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "student4", roles = "USER")
+    void testGetParticipationWithAllResults_cannotAccessParticipation1() throws Exception {
+        // student4 should have no connection to student1's participation and should thus receive a Forbidden HTTP status.
+        var result = addStudentParticipationWithResult(AssessmentType.AUTOMATIC, null);
+        StudentParticipation participation = (StudentParticipation) result.getSubmission().getParticipation();
+        request.get(participationsBaseUrl + participation.getId() + "/student-participation-with-all-results", HttpStatus.FORBIDDEN, ProgrammingExerciseStudentParticipation.class);
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "student4", roles = "USER")
+    void testGetParticipationWithAllResults_cannotAccessParticipation2() throws Exception {
+        // student4 should have no connection to student1's participation and should thus receive a Forbidden HTTP status.
+        ProgrammingExerciseStudentParticipation participation = participationUtilService.addStudentParticipationForProgrammingExercise(programmingExercise,
+                TEST_PREFIX + "student1");
+        request.get(participationsBaseUrl + participation.getId() + "/student-participation-with-all-results", HttpStatus.FORBIDDEN, ProgrammingExerciseStudentParticipation.class);
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "tutor1", roles = "TA")
+    void testGetAllResultsAsTutor() throws Exception {
+        // tutor should have access
+        var result = addStudentParticipationWithResult(AssessmentType.AUTOMATIC, null);
+        StudentParticipation participation = (StudentParticipation) result.getSubmission().getParticipation();
+        request.get(participationsBaseUrl + participation.getId() + "/student-participation-with-all-results", HttpStatus.OK, Result.class);
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "student1", roles = "USER")
+    void testGetParticipationAllResults_studentCannotAccessParticipationIfExerciseNotStarted() throws Exception {
+        ZonedDateTime startDate = ZonedDateTime.now().plusDays(1);
+        programmingExercise.setStartDate(startDate);
+        programmingExerciseRepository.save(programmingExercise);
+        ProgrammingExerciseStudentParticipation participation = participationUtilService.addStudentParticipationForProgrammingExercise(programmingExercise,
+                TEST_PREFIX + "student1");
+        request.get(participationsBaseUrl + participation.getId() + "/student-participation-with-all-results", HttpStatus.FORBIDDEN, ProgrammingExerciseStudentParticipation.class);
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "student1", roles = "USER")
+    void testGetParticipationAllResults_studentCanAccessIfNoStartDateSet() throws Exception {
+        programmingExercise.setStartDate(null);
+        programmingExercise.setReleaseDate(null);
+        programmingExerciseRepository.save(programmingExercise);
+        ProgrammingExerciseStudentParticipation participation = participationUtilService.addStudentParticipationForProgrammingExercise(programmingExercise,
+                TEST_PREFIX + "student1");
+        request.get(participationsBaseUrl + participation.getId() + "/student-participation-with-all-results", HttpStatus.OK, ProgrammingExerciseStudentParticipation.class);
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "tutor1", roles = "TA")
+    void testGetParticipationAllResults_canAccessParticipationIfExerciseNotStartedAndNotStudent() throws Exception {
+        ZonedDateTime startDate = ZonedDateTime.now().plusDays(1);
+        programmingExercise.setStartDate(startDate);
+        programmingExerciseRepository.save(programmingExercise);
+        ProgrammingExerciseStudentParticipation participation = participationUtilService.addStudentParticipationForProgrammingExercise(programmingExercise,
+                TEST_PREFIX + "student1");
+        request.get(participationsBaseUrl + participation.getId() + "/student-participation-with-all-results", HttpStatus.OK, ProgrammingExerciseStudentParticipation.class);
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "student1", roles = "USER")
+    void testGetParticipationAllResults_showsResultsDuringExam() throws Exception {
+        var result = setupExamExerciseWithParticipationAndResult(1, TEST_PREFIX + "student1");
+        Submission submission = result.getSubmission();
+        StudentParticipation participation = (StudentParticipation) result.getSubmission().getParticipation();
+        participationUtilService.addResultToSubmission(AssessmentType.AUTOMATIC, ZonedDateTime.now().minusMinutes(1), submission);
+        submissionRepository.save(submission);
+        var requestedParticipation = request.get(participationsBaseUrl + participation.getId() + "/student-participation-with-all-results", HttpStatus.OK,
+                ProgrammingExerciseStudentParticipation.class);
+        assertThat(participationUtilService.getResultsForParticipation(requestedParticipation)).hasSize(2);
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "student1", roles = "USER")
+    void testGetParticipationAllResults_afterExam_hidesResultsBeforeExamResultsPublished() throws Exception {
+        var result = setupExamExerciseWithParticipationAndResult(4, TEST_PREFIX + "student1");
+        StudentParticipation participation = (StudentParticipation) result.getSubmission().getParticipation();
+        participationUtilService.addResultToSubmission(AssessmentType.AUTOMATIC, ZonedDateTime.now().minusMinutes(1), result.getSubmission());
+        var requestedParticipation = request.get(participationsBaseUrl + participation.getId() + "/student-participation-with-all-results", HttpStatus.OK,
+                ProgrammingExerciseStudentParticipation.class);
+        assertThat(participationUtilService.getResultsForParticipation(requestedParticipation)).isEmpty();
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "student1", roles = "USER")
+    void testGetParticipationAllResults_showsResultsAfterExamResultsPublished() throws Exception {
+        var result = setupExamExerciseWithParticipationAndResult(10, TEST_PREFIX + "student1");
+        Submission submission = result.getSubmission();
+        StudentParticipation participation = (StudentParticipation) result.getSubmission().getParticipation();
+        participationUtilService.addResultToSubmission(AssessmentType.AUTOMATIC, ZonedDateTime.now().minusMinutes(1), submission);
+        submissionRepository.save(submission);
+        var requestedParticipation = request.get(participationsBaseUrl + participation.getId() + "/student-participation-with-all-results", HttpStatus.OK,
+                ProgrammingExerciseStudentParticipation.class);
+        assertThat(participationUtilService.getResultsForParticipation(requestedParticipation)).hasSize(2);
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "student1", roles = "USER")
+    void testGetLatestResultWithFeedbacksAsStudent() throws Exception {
+        var result = addStudentParticipationWithResult(null, null);
+        StudentParticipation participation = (StudentParticipation) result.getSubmission().getParticipation();
+        var requestedResult = request.get(participationsBaseUrl + participation.getId() + "/latest-result-with-feedbacks", HttpStatus.OK, Result.class);
+
+        assertThat(requestedResult.getFeedbacks()).noneMatch(Feedback::isInvisible);
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "student1", roles = "USER")
+    void testGetLatestResultWithFeedbacksAsStudent_showsResultDuringExam() throws Exception {
+        var result = setupExamExerciseWithParticipationAndResult(1, TEST_PREFIX + "student1");
+        StudentParticipation participation = (StudentParticipation) result.getSubmission().getParticipation();
+        var requestedResult = request.get(participationsBaseUrl + participation.getId() + "/latest-result-with-feedbacks", HttpStatus.OK, Result.class);
+
+        assertThat(requestedResult).isNotNull();
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "student1", roles = "USER")
+    void testGetLatestResultWithFeedbacksAsStudent_afterExam_hidesResultBeforeExamResultsPublished() throws Exception {
+        var result = setupExamExerciseWithParticipationAndResult(4, TEST_PREFIX + "student1");
+        StudentParticipation participation = (StudentParticipation) result.getSubmission().getParticipation();
+        var requestedResult = request.get(participationsBaseUrl + participation.getId() + "/latest-result-with-feedbacks", HttpStatus.OK, Result.class);
+
+        assertThat(requestedResult).isNull();
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "student1", roles = "USER")
+    void testGetLatestResultWithFeedbacksAsStudent_showsResultAfterExamResultsPublished() throws Exception {
+        var result = setupExamExerciseWithParticipationAndResult(10, TEST_PREFIX + "student1");
+        StudentParticipation participation = (StudentParticipation) result.getSubmission().getParticipation();
+        var requestedResult = request.get(participationsBaseUrl + participation.getId() + "/latest-result-with-feedbacks", HttpStatus.OK, Result.class);
+
+        assertThat(requestedResult).isNotNull();
+    }
+
+    @ParameterizedTest(name = "{displayName} [{index}] {argumentsWithNames}")
+    @EnumSource(AssessmentType.class)
+    @WithMockUser(username = TEST_PREFIX + "student1", roles = "USER")
+    void testGetResultWithFeedbacksFilteredBeforeLastDueDate(AssessmentType assessmentType) throws Exception {
+        programmingExercise.setDueDate(ZonedDateTime.now().minusHours(2));
+        programmingExercise.setAssessmentDueDate(null);
+        programmingExercise = programmingExerciseRepository.save(programmingExercise);
+
+        final var participation2 = participationUtilService.addStudentParticipationForProgrammingExercise(programmingExercise, TEST_PREFIX + "student2");
+        participation2.setIndividualDueDate(ZonedDateTime.now().plusDays(1));
+        participationRepository.save(participation2);
+
+        addStudentParticipationWithResult(assessmentType, null);
+        StudentParticipation participation = studentParticipationRepository
+                .findByExerciseIdAndStudentId(programmingExercise.getId(), userUtilService.getUserByLogin(TEST_PREFIX + "student1").getId()).getFirst();
+
+        var requestedResult = request.get(participationsBaseUrl + participation.getId() + "/latest-result-with-feedbacks", HttpStatus.OK, Result.class);
+        assertThat(requestedResult.getFeedbacks()).noneMatch(Feedback::isInvisible);
+        if (AssessmentType.AUTOMATIC == assessmentType) {
+            assertThat(requestedResult.getFeedbacks()).noneMatch(Feedback::isAfterDueDate);
+        }
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "student1", roles = "USER")
+    void testGetLatestResultWithFeedbacksForTemplateParticipationAsTutorShouldReturnForbidden() throws Exception {
+        TemplateProgrammingExerciseParticipation participation = addTemplateParticipationWithResult();
+        request.get(participationsBaseUrl + participation.getId() + "/latest-result-with-feedbacks", HttpStatus.FORBIDDEN, Result.class);
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "tutor1", roles = "TA")
+    void testGetLatestResultWithFeedbacksForTemplateParticipationAsTutor() throws Exception {
+        TemplateProgrammingExerciseParticipation participation = addTemplateParticipationWithResult();
+        var requestedResult = request.get(participationsBaseUrl + participation.getId() + "/latest-result-with-feedbacks", HttpStatus.OK, Result.class);
+
+        assertThat(requestedResult.getFeedbacks().stream().filter(Feedback::isInvisible)).hasSize(1);
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "instructor1", roles = "INSTRUCTOR")
+    void testGetLatestResultWithFeedbacksForTemplateParticipationAsInstructor() throws Exception {
+        TemplateProgrammingExerciseParticipation participation = addTemplateParticipationWithResult();
+        var requestedResult = request.get(participationsBaseUrl + participation.getId() + "/latest-result-with-feedbacks", HttpStatus.OK, Result.class);
+
+        assertThat(requestedResult.getFeedbacks().stream().filter(Feedback::isInvisible)).hasSize(1);
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "student1", roles = "USER")
+    void testGetLatestResultWithFeedbacksForSolutionParticipationAsTutorShouldReturnForbidden() throws Exception {
+        SolutionProgrammingExerciseParticipation participation = addSolutionParticipationWithResult(TEST_PREFIX + "student1");
+        request.get(participationsBaseUrl + participation.getId() + "/latest-result-with-feedbacks", HttpStatus.FORBIDDEN, Result.class);
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "tutor1", roles = "TA")
+    void testGetLatestResultWithFeedbacksForSolutionParticipationAsTutor() throws Exception {
+        SolutionProgrammingExerciseParticipation participation = addSolutionParticipationWithResult(TEST_PREFIX + "tutor1");
+        var requestedResult = request.get(participationsBaseUrl + participation.getId() + "/latest-result-with-feedbacks", HttpStatus.OK, Result.class);
+
+        assertThat(requestedResult.getFeedbacks().stream().filter(Feedback::isInvisible)).hasSize(1);
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "instructor1", roles = "INSTRUCTOR")
+    void testGetLatestResultWithFeedbacksForSolutionParticipationAsInstructor() throws Exception {
+        SolutionProgrammingExerciseParticipation participation = addSolutionParticipationWithResult(TEST_PREFIX + "instructor1");
+        var requestedResult = request.get(participationsBaseUrl + participation.getId() + "/latest-result-with-feedbacks", HttpStatus.OK, Result.class);
+
+        assertThat(requestedResult.getFeedbacks().stream().filter(Feedback::isInvisible)).hasSize(1);
+    }
+
+    @ParameterizedTest(name = "{displayName} [{index}] {argumentsWithNames}")
+    @ValueSource(booleans = { true, false })
+    @WithMockUser(username = TEST_PREFIX + "student1", roles = "USER")
+    void testGetLatestResultWithSubmission(boolean withSubmission) throws Exception {
+        var result = addStudentParticipationWithResult(AssessmentType.AUTOMATIC, null);
+        result.setSuccessful(true);
+        result = participationUtilService.addFeedbackToResults(result);
+        var submission = programmingExerciseUtilService.addProgrammingSubmissionToResultAndParticipation(result,
+                (ProgrammingExerciseStudentParticipation) programmingExerciseParticipation, "ABC");
+        MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
+        parameters.add("withSubmission", String.valueOf(withSubmission));
+        var resultResponse = request.get(participationsBaseUrl + programmingExerciseParticipation.getId() + "/latest-result-with-feedbacks", HttpStatus.OK, Result.class,
+                parameters);
+
+        result.filterSensitiveInformation();
+        result.filterSensitiveFeedbacks(true);
+        assertThat(resultResponse.getFeedbacks()).noneMatch(Feedback::isInvisible);
+        assertThat(resultResponse.getFeedbacks()).noneMatch(Feedback::isAfterDueDate);
+        assertThat(resultResponse.getFeedbacks()).containsExactlyInAnyOrderElementsOf(result.getFeedbacks());
+
+        assertThat(result).usingRecursiveComparison().ignoringFields("submission", "feedbacks", "participation", "lastModifiedDate").isEqualTo(resultResponse);
+        if (withSubmission) {
+            assertThat(submission).isEqualTo(resultResponse.getSubmission());
+        }
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "student1", roles = "USER")
+    void testGetLatestPendingSubmissionIfExists_student() throws Exception {
+        ProgrammingSubmission submission = (ProgrammingSubmission) new ProgrammingSubmission().submissionDate(ZonedDateTime.now().minusSeconds(61L));
+        submission = programmingExerciseUtilService.addProgrammingSubmission(programmingExercise, submission, TEST_PREFIX + "student1");
+        request.get(participationsBaseUrl + submission.getParticipation().getId() + "/latest-pending-submission", HttpStatus.OK, ProgrammingSubmission.class);
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "tutor1", roles = "TA")
+    void testGetLatestPendingSubmissionIfExists_ta() throws Exception {
+        ProgrammingSubmission submission = (ProgrammingSubmission) new ProgrammingSubmission().submissionDate(ZonedDateTime.now().minusSeconds(61L));
+        submission = programmingExerciseUtilService.addProgrammingSubmission(programmingExercise, submission, TEST_PREFIX + "student1");
+        request.get(participationsBaseUrl + submission.getParticipation().getId() + "/latest-pending-submission", HttpStatus.OK, ProgrammingSubmission.class);
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "instructor1", roles = "INSTRUCTOR")
+    void testGetLatestPendingSubmissionIfExists_instructor() throws Exception {
+        ProgrammingSubmission submission = (ProgrammingSubmission) new ProgrammingSubmission().submissionDate(ZonedDateTime.now().minusSeconds(61L));
+        submission = programmingExerciseUtilService.addProgrammingSubmission(programmingExercise, submission, TEST_PREFIX + "student1");
+        request.get(participationsBaseUrl + submission.getParticipation().getId() + "/latest-pending-submission", HttpStatus.OK, ProgrammingSubmission.class);
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "instructor1", roles = "INSTRUCTOR")
+    void testGetLatestPendingSubmission_notProgrammingParticipation() throws Exception {
+        StudentParticipation studentParticipation = new StudentParticipation();
+        studentParticipation = participationRepository.save(studentParticipation);
+        request.get(participationsBaseUrl + studentParticipation.getId() + "/latest-pending-submission", HttpStatus.NOT_FOUND, ProgrammingSubmission.class);
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "student1", roles = "USER")
+    void testGetLatestPendingSubmissionIfNotExists_student() throws Exception {
+        // Submission has a result, therefore not considered pending.
+
+        Result result = resultRepository.save(new Result());
+        ProgrammingSubmission submission = (ProgrammingSubmission) new ProgrammingSubmission().submissionDate(ZonedDateTime.now().minusSeconds(61L));
+        submission = programmingExerciseUtilService.addProgrammingSubmission(programmingExercise, submission, TEST_PREFIX + "student1");
+        submission.addResult(result);
+        Submission returnedSubmission = request.getNullable(participationsBaseUrl + submission.getParticipation().getId() + "/latest-pending-submission", HttpStatus.OK,
+                ProgrammingSubmission.class);
+        assertThat(returnedSubmission).isEqualTo(submission);
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "tutor1", roles = "TA")
+    void testGetLatestPendingSubmissionIfNotExists_ta() throws Exception {
+        // Submission has a result, therefore not considered pending.
+        Result result = resultRepository.save(new Result());
+        ProgrammingSubmission submission = (ProgrammingSubmission) new ProgrammingSubmission().submissionDate(ZonedDateTime.now().minusSeconds(61L));
+        submission = programmingExerciseUtilService.addProgrammingSubmission(programmingExercise, submission, TEST_PREFIX + "student1");
+        submission.addResult(result);
+        Submission returnedSubmission = request.getNullable(participationsBaseUrl + submission.getParticipation().getId() + "/latest-pending-submission", HttpStatus.OK,
+                ProgrammingSubmission.class);
+        assertThat(returnedSubmission).isEqualTo(submission);
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "instructor1", roles = "INSTRUCTOR")
+    void testGetLatestPendingSubmissionIfNotExists_instructor() throws Exception {
+        // Submission has a result, therefore not considered pending.
+        Result result = resultRepository.save(new Result());
+        ProgrammingSubmission submission = (ProgrammingSubmission) new ProgrammingSubmission().submissionDate(ZonedDateTime.now().minusSeconds(61L));
+        submission = programmingExerciseUtilService.addProgrammingSubmission(programmingExercise, submission, TEST_PREFIX + "student1");
+        submission.addResult(result);
+        Submission returnedSubmission = request.getNullable(participationsBaseUrl + submission.getParticipation().getId() + "/latest-pending-submission", HttpStatus.OK,
+                ProgrammingSubmission.class);
+        assertThat(returnedSubmission).isEqualTo(submission);
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "student4", roles = "USER")
+    void testGetLatestPendingSubmission_cannotAccessParticipation() throws Exception {
+        // student4 should have no connection to student1's participation and should thus receive a Forbidden HTTP status.
+        ProgrammingSubmission submission = (ProgrammingSubmission) new ProgrammingSubmission().submissionDate(ZonedDateTime.now());
+        submission = programmingExerciseUtilService.addProgrammingSubmission(programmingExercise, submission, TEST_PREFIX + "student1");
+        Submission returnedSubmission = request.getNullable(participationsBaseUrl + submission.getParticipation().getId() + "/latest-pending-submission", HttpStatus.FORBIDDEN,
+                ProgrammingSubmission.class);
+        assertThat(returnedSubmission).isNull();
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "instructor1", roles = "INSTRUCTOR")
+    void getLatestSubmissionsForExercise_instructor() throws Exception {
+        ProgrammingSubmission submission = (ProgrammingSubmission) new ProgrammingSubmission().submissionDate(ZonedDateTime.now().minusSeconds(61L));
+        submission = programmingExerciseUtilService.addProgrammingSubmission(programmingExercise, submission, TEST_PREFIX + "student1");
+        ProgrammingSubmission submission2 = (ProgrammingSubmission) new ProgrammingSubmission().submissionDate(ZonedDateTime.now().minusSeconds(61L));
+        submission2 = programmingExerciseUtilService.addProgrammingSubmission(programmingExercise, submission2, TEST_PREFIX + "student2");
+        ProgrammingSubmission notPendingSubmission = (ProgrammingSubmission) new ProgrammingSubmission().submissionDate(ZonedDateTime.now().minusSeconds(55L));
+        programmingExerciseUtilService.addProgrammingSubmissionWithResult(programmingExercise, notPendingSubmission, TEST_PREFIX + "student3");
+        Map<Long, ProgrammingSubmission> submissions = new HashMap<>();
+        submissions.put(submission.getParticipation().getId(), submission);
+        submissions.put(submission2.getParticipation().getId(), submission2);
+        submissions.put(notPendingSubmission.getParticipation().getId(), null);
+        Map<Long, ProgrammingSubmission> returnedSubmissions = request.getMap(exercisesBaseUrl + programmingExercise.getId() + "/latest-pending-submissions", HttpStatus.OK,
+                Long.class, ProgrammingSubmission.class);
+        assertThat(returnedSubmissions).isEqualTo(submissions);
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "student1", roles = "USER")
+    void testGetLatestSubmissionsForExercise_studentForbidden() throws Exception {
+        request.getMap(exercisesBaseUrl + programmingExercise.getId() + "/latest-pending-submissions", HttpStatus.FORBIDDEN, Long.class, ProgrammingSubmission.class);
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "stidemt1", roles = "USER")
+    void testGetParticipationWithResultsForStudentParticipation_forbidden() throws Exception {
+        request.getMap(exercisesBaseUrl + programmingExercise.getId() + "/latest-pending-submissions", HttpStatus.FORBIDDEN, Long.class, ProgrammingSubmission.class);
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "student1", roles = "USER")
+    void checkIfParticipationHasResult_withResult_returnsTrue() throws Exception {
+        addStudentParticipationWithResult(null, null);
+
+        final var response = request.get("/api/programming/programming-exercise-participations/" + programmingExerciseParticipation.getId() + "/has-result", HttpStatus.OK,
+                Boolean.class);
+
+        assertThat(response).isTrue();
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "student1", roles = "USER")
+    void checkIfParticipationHasResult_withoutResult_returnsFalse() throws Exception {
+        programmingExerciseParticipation = participationUtilService.addStudentParticipationForProgrammingExercise(programmingExercise, TEST_PREFIX + "student1");
+
+        final var response = request.get("/api/programming/programming-exercise-participations/" + programmingExerciseParticipation.getId() + "/has-result", HttpStatus.OK,
+                Boolean.class);
+
+        assertThat(response).isFalse();
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "student1", roles = "USER")
+    void testGetProgrammingExerciseStudentParticipationByRepoName() throws Exception {
+        programmingExercise.setReleaseDate(ZonedDateTime.now());
+        programmingExercise = programmingExerciseRepository.save(programmingExercise);
+
+        var participation = participationUtilService.addStudentParticipationForProgrammingExercise(programmingExercise, TEST_PREFIX + "student1");
+
+        var repoName = extractRepoName(participation.getRepositoryUri());
+        RepoNameProgrammingStudentParticipationDTO participationDTO = request.get("/api/programming/programming-exercise-participations?repoName=" + repoName, HttpStatus.OK,
+                RepoNameProgrammingStudentParticipationDTO.class);
+
+        assertThat(participationDTO.id()).isEqualTo(participation.getId());
+        assertThat(participationDTO.exercise().id()).isEqualTo(participation.getExercise().getId());
+        assertThat(participationDTO.exercise().course().id()).isEqualTo(participation.getExercise().getCourseViaExerciseGroupOrCourseMember().getId());
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "student1", roles = "USER")
+    void testGetProgrammingExerciseStudentParticipationNoParam() throws Exception {
+        String body = request.get("/api/programming/programming-exercise-participations", HttpStatus.BAD_REQUEST, String.class);
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "student1", roles = "USER")
+    void testGetProgrammingExerciseStudentParticipationByRepoNameNotFound() throws Exception {
+        var participation = participationUtilService.addStudentParticipationForProgrammingExercise(programmingExercise, TEST_PREFIX + "student1");
+
+        // Generate a random URI that is not in the database
+        URI repoUrl;
+        Optional<ProgrammingExerciseStudentParticipation> foundParticipation;
+        do {
+            repoUrl = new URI(participation.getRepositoryUri());
+            repoUrl = new URI(repoUrl.getScheme(), repoUrl.getUserInfo(), repoUrl.getHost(), repoUrl.getPort(), "/" + UUID.randomUUID().toString(), repoUrl.getQuery(),
+                    repoUrl.getFragment());
+            foundParticipation = programmingExerciseStudentParticipationRepository.findByRepositoryUri(repoUrl.toString());
+        }
+        while (foundParticipation.isPresent());
+
+        var repoName = extractRepoName(repoUrl.toString());
+        String body = request.get("/api/programming/programming-exercise-participations?repoName=" + repoName, HttpStatus.NOT_FOUND, String.class);
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "student1", roles = "USER")
+    void testGetProgrammingExerciseStudentParticipationByInvalidRepoName() throws Exception {
+        var participation = participationUtilService.addStudentParticipationForProgrammingExercise(programmingExercise, TEST_PREFIX + "student1");
+
+        // Generate a random URI that is not in the database
+        URI repoUrl;
+        Optional<ProgrammingExerciseStudentParticipation> foundParticipation;
+        do {
+            repoUrl = new URI(participation.getRepositoryUri());
+
+            // test a repoName which does not match the expected pattern of <project_key>-<repo-type>
+            // generate random string without a dash
+            String invalidRepoName = UUID.randomUUID().toString().replace("-", "");
+            repoUrl = new URI(repoUrl.getScheme(), repoUrl.getUserInfo(), repoUrl.getHost(), repoUrl.getPort(), "/" + invalidRepoName, repoUrl.getQuery(), repoUrl.getFragment());
+            foundParticipation = programmingExerciseStudentParticipationRepository.findByRepositoryUri(repoUrl.toString());
+        }
+        while (foundParticipation.isPresent());
+
+        var repoName = extractRepoName(repoUrl.toString());
+        String body = request.get("/api/programming/programming-exercise-participations?repoName=" + repoName, HttpStatus.BAD_REQUEST, String.class);
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "student1", roles = "USER")
+    void testGetProgrammingExerciseStudentParticipationByRepoNameNotVisible() throws Exception {
+        var participation = participationUtilService.addStudentParticipationForProgrammingExercise(programmingExercise, TEST_PREFIX + "student2");
+
+        var repoName = extractRepoName(participation.getRepositoryUri());
+        String body = request.get("/api/programming/programming-exercise-participations?repoName=" + repoName, HttpStatus.FORBIDDEN, String.class);
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "student1", roles = "USER")
+    void testGetProgrammingExerciseStudentParticipationByRepoNameExam() throws Exception {
+        var programmingExercise = programmingExerciseUtilService.addCourseExamExerciseGroupWithProgrammingExerciseAndExamDates(ZonedDateTime.now().plusHours(1),
+                ZonedDateTime.now().plusHours(2), ZonedDateTime.now().plusHours(3), ZonedDateTime.now().plusHours(4), TEST_PREFIX + "student1", 1000);
+        programmingExercise.setReleaseDate(ZonedDateTime.now());
+        programmingExercise = programmingExerciseRepository.save(programmingExercise);
+
+        var participation = participationUtilService.addStudentParticipationForProgrammingExercise(programmingExercise, TEST_PREFIX + "student1");
+
+        var repoName = extractRepoName(participation.getRepositoryUri());
+        String body = request.get("/api/programming/programming-exercise-participations?repoName=" + repoName, HttpStatus.FORBIDDEN, String.class);
+    }
+
+    String extractRepoName(String repoUrl) {
+        // <server.url>/git/<project_key>/<repo-name>.git
+        return repoUrl.substring(repoUrl.lastIndexOf("/") + 1, repoUrl.length() - 4);
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "student1", roles = "USER")
+    void checkResetRepository_noAccess_forbidden() throws Exception {
+        programmingExerciseParticipation = participationUtilService.addStudentParticipationForProgrammingExercise(programmingExercise, TEST_PREFIX + "student2");
+
+        request.put("/api/programming/programming-exercise-participations/" + programmingExerciseParticipation.getId() + "/reset-repository", null, HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "student1", roles = "USER")
+    void checkResetRepository_noAccessToGradedParticipation_forbidden() throws Exception {
+        var gradedParticipation = participationUtilService.addStudentParticipationForProgrammingExercise(programmingExercise, TEST_PREFIX + "student2");
+        var practiceParticipation = participationUtilService.addStudentParticipationForProgrammingExercise(programmingExercise, TEST_PREFIX + "student1");
+        practiceParticipation.setPracticeMode(true);
+        participationRepository.save(practiceParticipation);
+
+        request.put(
+                "/api/programming/programming-exercise-participations/" + practiceParticipation.getId() + "/reset-repository?gradedParticipationId=" + gradedParticipation.getId(),
+                null, HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "student1", roles = "USER")
+    void checkResetRepository_participationLocked_forbidden() throws Exception {
+        ProgrammingExerciseStudentParticipation programmingExerciseStudentParticipation = participationUtilService
+                .addStudentParticipationForProgrammingExercise(programmingExercise, TEST_PREFIX + "student1");
+        programmingExerciseStudentParticipation.setIndividualDueDate(ZonedDateTime.now().minusDays(1));
+        programmingExerciseStudentParticipation = studentParticipationRepository.save(programmingExerciseStudentParticipation);
+
+        request.put("/api/programming/programming-exercise-participations/" + programmingExerciseStudentParticipation.getId() + "/reset-repository", null, HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "student1", roles = "USER")
+    void checkResetRepository_exam_badRequest() throws Exception {
+        programmingExercise = programmingExerciseUtilService.addCourseExamExerciseGroupWithOneProgrammingExercise();
+        programmingExerciseParticipation = participationUtilService.addStudentParticipationForProgrammingExercise(programmingExercise, TEST_PREFIX + "student1");
+        Exam exam = examRepository.findByIdWithExamUsersExerciseGroupsAndExercisesElseThrow(programmingExercise.getExam().getId());
+        examUtilService.registerUsersForExamAndSaveExam(exam, TEST_PREFIX, 1);
+        studentExamService.generateStudentExams(exam);
+        request.put("/api/programming/programming-exercise-participations/" + programmingExerciseParticipation.getId() + "/reset-repository", null, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * TODO move the following test into a different test file, as they do not use the programming-exercise-participations/.. endpoint, but programming-exercise/..
+     * move the endpoint itself too
+     * <p>
+     * Test for GET - programming-exercise/{exerciseID}/commit-history/{repositoryType}
+     */
+    @Nested
+    class GetCommitHistoryForTemplateSolutionTestOrAuxRepo {
+
+        String PATH_PREFIX;
+
+        ProgrammingExercise programmingExerciseWithAuxRepo;
+
+        @BeforeEach
+        void setup() throws GitAPIException {
+            userUtilService.addUsers(TEST_PREFIX, 4, 2, 0, 2);
+            var course = programmingExerciseUtilService.addCourseWithOneProgrammingExerciseAndTestCases();
+            programmingExerciseWithAuxRepo = ExerciseUtilService.getFirstExerciseWithType(course, ProgrammingExercise.class);
+            programmingExerciseWithAuxRepo = programmingExerciseRepository.findWithEagerStudentParticipationsById(programmingExerciseWithAuxRepo.getId()).orElseThrow();
+            programmingExerciseIntegrationTestService.addAuxiliaryRepositoryToExercise(programmingExerciseWithAuxRepo);
+
+            doThrow(new NoHeadException("error")).when(gitService).getCommitInfos(any());
+            PATH_PREFIX = "/api/programming/programming-exercise/" + programmingExerciseWithAuxRepo.getId() + "/commit-history/";
+        }
+
+        @Test
+        @WithMockUser(username = TEST_PREFIX + "instructor1", roles = "INSTRUCTOR")
+        void shouldReturnBadRequestForInvalidRepositoryType() throws Exception {
+            request.getList(PATH_PREFIX + "INVALIDTYPE", HttpStatus.BAD_REQUEST, CommitInfoDTO.class);
+        }
+
+        @Test
+        @WithMockUser(username = TEST_PREFIX + "instructor1", roles = "INSTRUCTOR")
+        void shouldGetListForTemplateRepository() throws Exception {
+            assertThat(request.getList(PATH_PREFIX + "TEMPLATE", HttpStatus.OK, CommitInfoDTO.class)).isEmpty();
+        }
+
+        @Test
+        @WithMockUser(username = TEST_PREFIX + "instructor1", roles = "INSTRUCTOR")
+        void shouldGetListForSolutionRepository() throws Exception {
+            assertThat(request.getList(PATH_PREFIX + "SOLUTION", HttpStatus.OK, CommitInfoDTO.class)).isEmpty();
+        }
+
+        @Test
+        @WithMockUser(username = TEST_PREFIX + "instructor1", roles = "INSTRUCTOR")
+        void shouldGetListForTestsRepository() throws Exception {
+            assertThat(request.getList(PATH_PREFIX + "TESTS", HttpStatus.OK, CommitInfoDTO.class)).isEmpty();
+        }
+
+        @Test
+        @WithMockUser(username = TEST_PREFIX + "instructor1", roles = "INSTRUCTOR")
+        void shouldGetListForAuxiliaryRepository() throws Exception {
+            assertThat(request.getList(PATH_PREFIX + "AUXILIARY?repositoryId=" + programmingExerciseWithAuxRepo.getAuxiliaryRepositories().getFirst().getId(), HttpStatus.OK,
+                    CommitInfoDTO.class)).isEmpty();
+        }
+
+        @Test
+        @WithMockUser(username = TEST_PREFIX + "instructor1", roles = "INSTRUCTOR")
+        void shouldThrowWithInvalidAuxiliaryRepositoryId() throws Exception {
+            request.getList(PATH_PREFIX + "AUXILIARY?repositoryId=" + 128, HttpStatus.NOT_FOUND, CommitInfoDTO.class);
+        }
+    }
+
+    /**
+     * Tests for programming-exercise-participations/{participationId}/files-content/{commitId}
+     */
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "instructor1", roles = "INSTRUCTOR")
+    void getParticipationRepositoryFilesInstructorSuccess() throws Exception {
+        var commitHash = "commitHash";
+        var participation = participationUtilService.addStudentParticipationForProgrammingExercise(programmingExercise, TEST_PREFIX + "student1");
+        var commitInfo = new CommitInfoDTO("hash", "msg1", ZonedDateTime.of(2020, 1, 1, 0, 0, 0, 0, ZoneId.of("UTC")), "author", "authorEmail");
+        var commitInfo2 = new CommitInfoDTO("hash2", "msg2", ZonedDateTime.of(2020, 1, 2, 0, 0, 0, 0, ZoneId.of("UTC")), "author2", "authorEmail2");
+        doReturn(List.of(commitInfo, commitInfo2)).when(gitService).getCommitInfos(participation.getVcsRepositoryUri());
+        doReturn(new Repository("ab", new VcsRepositoryUri("uri"))).when(gitService).checkoutRepositoryAtCommit(participation.getVcsRepositoryUri(), commitHash, true);
+        doReturn(Map.of()).when(gitService).listFilesAndFolders(any());
+        doReturn(Map.of()).when(gitService).listFilesAndFolders(any(), anyBoolean());
+        doNothing().when(gitService).switchBackToDefaultBranchHead(any());
+
+        request.getMap("/api/programming/programming-exercise-participations/" + participation.getId() + "/files-content/" + commitHash, HttpStatus.OK, String.class, String.class);
+    }
+
+    /**
+     * TODO refactor endpoint to contain participation -> programming-exercise-participations
+     * tests GET - programming-exercise/{exerciseId}/files-content-commit-details/{commitId}
+     */
+    @Nested
+    class GetParticipationRepositoryFilesForCommitsDetailsView {
+
+        String PATH_PREFIX;
+
+        String COMMIT_HASH;
+
+        ProgrammingExerciseParticipation participation;
+
+        @BeforeEach
+        void setup() throws GitAPIException, URISyntaxException, IOException {
+            userUtilService.addUsers(TEST_PREFIX, 4, 2, 0, 2);
+            participation = participationUtilService.addStudentParticipationForProgrammingExercise(programmingExercise, TEST_PREFIX + "student1");
+            var course = programmingExerciseUtilService.addCourseWithOneProgrammingExerciseAndTestCases();
+            programmingExercise = ExerciseUtilService.getFirstExerciseWithType(course, ProgrammingExercise.class);
+            programmingExercise = programmingExerciseRepository.findWithEagerStudentParticipationsById(programmingExercise.getId()).orElseThrow();
+            programmingExerciseIntegrationTestService.addAuxiliaryRepositoryToExercise(programmingExercise);
+            COMMIT_HASH = "commitHash";
+
+            doReturn(Map.of()).when(gitService).listFilesAndFolders(any());
+            doReturn(Map.of()).when(gitService).listFilesAndFolders(any(), anyBoolean());
+            doNothing().when(gitService).switchBackToDefaultBranchHead(any());
+            doReturn(new Repository("ab", new VcsRepositoryUri("uri"))).when(gitService).checkoutRepositoryAtCommit(any(VcsRepositoryUri.class), any(String.class),
+                    any(Boolean.class));
+            doThrow(new NoHeadException("error")).when(gitService).getCommitInfos(any());
+            PATH_PREFIX = "/api/programming/programming-exercise/" + participation.getProgrammingExercise().getId() + "/files-content-commit-details/" + COMMIT_HASH;
+        }
+
+        @Test
+        @WithMockUser(username = TEST_PREFIX + "instructor1", roles = "INSTRUCTOR")
+        void shouldReturnBadRequestWithoutAnyProvidedParameters() throws Exception {
+            request.getMap(PATH_PREFIX, HttpStatus.BAD_REQUEST, String.class, String.class);
+        }
+
+        @Test
+        @WithMockUser(username = TEST_PREFIX + "instructor1", roles = "INSTRUCTOR")
+        void shouldReturnForParticipation() throws Exception {
+            assertThat(request.getMap(PATH_PREFIX + "?participationId=" + participation.getId(), HttpStatus.OK, String.class, String.class)).isEmpty();
+        }
+
+        @Test
+        @WithMockUser(username = TEST_PREFIX + "instructor1", roles = "INSTRUCTOR")
+        void shouldReturnFilesForTemplateRepository() throws Exception {
+            assertThat(request.getMap(PATH_PREFIX + "?repositoryType=TEMPLATE", HttpStatus.OK, String.class, String.class)).isEmpty();
+        }
+
+        @Test
+        @WithMockUser(username = TEST_PREFIX + "instructor1", roles = "INSTRUCTOR")
+        void shouldReturnFilesForSolutionRepository() throws Exception {
+            assertThat(request.getMap(PATH_PREFIX + "?repositoryType=SOLUTION", HttpStatus.OK, String.class, String.class)).isEmpty();
+        }
+
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "instructor1", roles = "INSTRUCTOR")
+    void retrieveCommitInfoInstructorSuccess() throws Exception {
+        var participation = participationUtilService.addStudentParticipationForProgrammingExercise(programmingExercise, TEST_PREFIX + "student1");
+        var commitInfo = new CommitInfoDTO("hash", "msg1", ZonedDateTime.of(2020, 1, 1, 0, 0, 0, 0, ZoneId.of("UTC")), "author", "authorEmail");
+        var commitInfo2 = new CommitInfoDTO("hash2", "msg2", ZonedDateTime.of(2020, 1, 2, 0, 0, 0, 0, ZoneId.of("UTC")), "author2", "authorEmail2");
+        doReturn(List.of(commitInfo, commitInfo2)).when(gitService).getCommitInfos(participation.getVcsRepositoryUri());
+        request.getList("/api/programming/programming-exercise-participations/" + participation.getId() + "/commits-info", HttpStatus.OK, CommitInfoDTO.class);
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "instructor1", roles = "INSTRUCTOR")
+    void retrieveCommitInfoGitExceptionEmptyList() throws Exception {
+        var participation = participationUtilService.addStudentParticipationForProgrammingExercise(programmingExercise, TEST_PREFIX + "student1");
+        doThrow(new NoHeadException("error")).when(gitService).getCommitInfos(participation.getVcsRepositoryUri());
+        assertThat(request.getList("/api/programming/programming-exercise-participations/" + participation.getId() + "/commits-info", HttpStatus.OK, CommitInfoDTO.class))
+                .isEmpty();
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "editor1", roles = "EDITOR")
+    void retrieveCommitInfoEditorForbidden() throws Exception {
+        var participation = participationUtilService.addStudentParticipationForProgrammingExercise(programmingExercise, TEST_PREFIX + "student1");
+        request.getList("/api/programming/programming-exercise-participations/" + participation.getId() + "/commits-info", HttpStatus.FORBIDDEN, CommitInfoDTO.class);
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "student1", roles = "USER")
+    void retrieveCommitHistoryStudentSuccess() throws Exception {
+        var participation = participationUtilService.addStudentParticipationForProgrammingExercise(programmingExercise, TEST_PREFIX + "student1");
+        var commitInfo = new CommitInfoDTO("hash", "msg1", ZonedDateTime.of(2020, 1, 1, 0, 0, 0, 0, ZoneId.of("UTC")), "author", "authorEmail");
+        var commitInfo2 = new CommitInfoDTO("hash2", "msg2", ZonedDateTime.of(2020, 1, 2, 0, 0, 0, 0, ZoneId.of("UTC")), "author2", "authorEmail2");
+        doReturn(List.of(commitInfo, commitInfo2)).when(gitService).getCommitInfos(participation.getVcsRepositoryUri());
+        request.getList("/api/programming/programming-exercise-participations/" + participation.getId() + "/commit-history", HttpStatus.OK, CommitInfoDTO.class);
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "student1", roles = "USER")
+    void retrieveCommitHistoryStudentNotOwningParticipationForbidden() throws Exception {
+        var participation = participationUtilService.addStudentParticipationForProgrammingExercise(programmingExercise, TEST_PREFIX + "student2");
+        request.getList("/api/programming/programming-exercise-participations/" + participation.getId() + "/commit-history", HttpStatus.FORBIDDEN, CommitInfoDTO.class);
+    }
+
+    @Test
+    @WithMockUser(username = TEST_PREFIX + "tutor1", roles = "TA")
+    void retrieveCommitHistoryTutorNotOwningParticipationSuccess() throws Exception {
+        var participation = participationUtilService.addStudentParticipationForProgrammingExercise(programmingExercise, TEST_PREFIX + "student1");
+        var commitInfo = new CommitInfoDTO("hash", "msg1", ZonedDateTime.of(2020, 1, 1, 0, 0, 0, 0, ZoneId.of("UTC")), "author", "authorEmail");
+        var commitInfo2 = new CommitInfoDTO("hash2", "msg2", ZonedDateTime.of(2020, 1, 2, 0, 0, 0, 0, ZoneId.of("UTC")), "author2", "authorEmail2");
+        doReturn(List.of(commitInfo, commitInfo2)).when(gitService).getCommitInfos(participation.getVcsRepositoryUri());
+        request.getList("/api/programming/programming-exercise-participations/" + participation.getId() + "/commit-history", HttpStatus.OK, CommitInfoDTO.class);
+    }
+
+    private Result addStudentParticipationWithResult(AssessmentType assessmentType, ZonedDateTime completionDate) {
+        programmingExerciseParticipation = participationUtilService.addStudentParticipationForProgrammingExercise(programmingExercise, TEST_PREFIX + "student1");
+
+        var submission = ParticipationFactory.generateProgrammingSubmission(true);
+        Result r = programmingExerciseUtilService.addProgrammingSubmissionWithResult(programmingExercise, submission, TEST_PREFIX + "student1");
+        r.successful(true).rated(true).score(100D).assessmentType(assessmentType).completionDate(completionDate);
+
+        return participationUtilService.addVariousVisibilityFeedbackToResult(r);
+    }
+
+    private TemplateProgrammingExerciseParticipation addTemplateParticipationWithResult() {
+        programmingExerciseParticipation = programmingExerciseParticipationUtilService.addTemplateParticipationForProgrammingExercise(programmingExercise)
+                .getTemplateParticipation();
+        Result r = programmingExerciseUtilService.addTemplateSubmissionWithResult(programmingExercise);
+        r.successful(true).rated(true).score(100D).assessmentType(AssessmentType.AUTOMATIC).completionDate(null);
+
+        participationUtilService.addVariousVisibilityFeedbackToResult(r);
+        return (TemplateProgrammingExerciseParticipation) programmingExerciseParticipation;
+    }
+
+    private SolutionProgrammingExerciseParticipation addSolutionParticipationWithResult(String login) {
+        programmingExerciseParticipation = programmingExerciseParticipationUtilService.addSolutionParticipationForProgrammingExercise(programmingExercise)
+                .getSolutionParticipation();
+        Result result = this.programmingExerciseUtilService.addSolutionSubmissionWithResult(programmingExercise);
+        ;
+        result.successful(true).rated(true).score(100D).assessmentType(AssessmentType.AUTOMATIC).completionDate(null);
+
+        participationUtilService.addVariousVisibilityFeedbackToResult(result);
+        return (SolutionProgrammingExerciseParticipation) programmingExerciseParticipation;
+    }
+
+    /**
+     * Sets up an exam exercise with a participation and a result. The exam duration is two hours and the publishResultsDate is 10 hours after the exam start.
+     *
+     * @param hoursSinceExamStart The hours since the exam start.
+     * @param userLogin           The user login
+     * @return The result attached to the participation
+     */
+    private Result setupExamExerciseWithParticipationAndResult(int hoursSinceExamStart, String userLogin) {
+        var now = ZonedDateTime.now();
+        var startDate = now.minusHours(hoursSinceExamStart);
+        var endDate = startDate.plusHours(1);
+        var visibilityDate = startDate.minusHours(1);
+        var publishResultsDate = startDate.plusHours(10);
+        var workingTime = 120 * 60;
+        programmingExercise = programmingExerciseUtilService.addCourseExamExerciseGroupWithProgrammingExerciseAndExamDates(visibilityDate, startDate, endDate, publishResultsDate,
+                userLogin, workingTime);
+        programmingExerciseParticipation = participationUtilService.addStudentParticipationForProgrammingExercise(programmingExercise, userLogin);
+        return addStudentParticipationWithResult(AssessmentType.AUTOMATIC, startDate.plusMinutes(2));
+    }
+
+}

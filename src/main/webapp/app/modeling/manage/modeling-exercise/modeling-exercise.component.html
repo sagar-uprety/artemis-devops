@@ -1,0 +1,156 @@
+@if (modelingExercises && filteredModelingExercises.length > 0) {
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse" (sortChange)="sortRows()">
+                    @if (course.isAtLeastInstructor) {
+                        <th class="d-md-table-cell">
+                            <input class="form-check-input" type="checkbox" (change)="toggleMultipleExercises(modelingExercises)" [ngModel]="allChecked" />
+                        </th>
+                    }
+                    <th jhiSortBy="id"><span jhiTranslate="global.field.id"></span>&nbsp;<fa-icon [icon]="faSort" /></th>
+                    <th jhiSortBy="title"><span jhiTranslate="artemisApp.exercise.title"></span>&nbsp;<fa-icon [icon]="faSort" /></th>
+                    <th jhiSortBy="releaseDate"><span jhiTranslate="artemisApp.exercise.release"></span>&nbsp;<fa-icon [icon]="faSort" /></th>
+                    <th jhiSortBy="dueDate"><span jhiTranslate="artemisApp.exercise.due"></span>&nbsp;<fa-icon [icon]="faSort" /></th>
+                    <th jhiSortBy="assessmentDueDate"><span jhiTranslate="artemisApp.exercise.assessmentDue"></span>&nbsp;<fa-icon [icon]="faSort" /></th>
+                    <th jhiSortBy="maxPoints"><span jhiTranslate="artemisApp.exercise.points"></span>&nbsp;<fa-icon [icon]="faSort" /></th>
+                    <th jhiSortBy="bonusPoints"><span jhiTranslate="artemisApp.exercise.bonus"></span>&nbsp;<fa-icon [icon]="faSort" /></th>
+                    <th jhiSortBy="includedInOverallScore"><span jhiTranslate="artemisApp.exercise.includedCompletely"></span>&nbsp;<fa-icon [icon]="faSort" /></th>
+                    @if (course.presentationScore) {
+                        <th jhiSortBy="presentationScoreEnabled">
+                            <span jhiTranslate="artemisApp.exercise.presentationScoreEnabled.title"></span>&nbsp;<fa-icon [icon]="faSort" />
+                        </th>
+                    }
+                    <th><span jhiTranslate="artemisApp.modelingExercise.diagramType"></span></th>
+                    <th class="d-md-table-cell"><span jhiTranslate="artemisApp.exercise.categories"></span></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (modelingExercise of filteredModelingExercises; track trackId($index, modelingExercise)) {
+                    <tr id="{{ 'exercise-card-' + modelingExercise.id }}">
+                        @if (course.isAtLeastInstructor) {
+                            <td class="d-md-table-cell">
+                                <input class="form-check-input" type="checkbox" (change)="toggleExercise(modelingExercise)" [ngModel]="isExerciseSelected(modelingExercise)" />
+                            </td>
+                        }
+                        <td>
+                            @if (modelingExercise.isAtLeastTutor) {
+                                <a [routerLink]="['/course-management', modelingExercise.course?.id, 'modeling-exercises', modelingExercise.id]">
+                                    {{ modelingExercise.id }}
+                                </a>
+                            } @else {
+                                {{ modelingExercise.id }}
+                            }
+                        </td>
+                        <td id="modeling-exercise-{{ modelingExercise.id }}-title">
+                            @if (modelingExercise.isAtLeastTutor) {
+                                <a [routerLink]="['/course-management', modelingExercise.course?.id, 'modeling-exercises', modelingExercise.id]">
+                                    {{ modelingExercise.title }}
+                                </a>
+                            } @else {
+                                {{ modelingExercise.title }}
+                            }
+                        </td>
+                        <td id="modeling-exercise-{{ modelingExercise.id }}-releaseDate">{{ modelingExercise.releaseDate | artemisDate }}</td>
+                        <td id="modeling-exercise-{{ modelingExercise.id }}-dueDate">{{ modelingExercise.dueDate | artemisDate }}</td>
+                        <td id="modeling-exercise-{{ modelingExercise.id }}-assessmentDueDate">{{ modelingExercise.assessmentDueDate | artemisDate }}</td>
+                        <td id="modeling-exercise-{{ modelingExercise.id }}-maxPoints">{{ modelingExercise.maxPoints }}</td>
+                        <td id="modeling-exercise-{{ modelingExercise.id }}-bonusPoints">{{ modelingExercise.bonusPoints }}</td>
+                        <td id="modeling-exercise-{{ modelingExercise.id }}-included">{{ exerciseService.isIncludedInScore(modelingExercise) }}</td>
+                        @if (course.presentationScore) {
+                            <td>{{ modelingExercise.presentationScoreEnabled }}</td>
+                        }
+                        <td jhiTranslate="{{ 'artemisApp.DiagramType.' + modelingExercise.diagramType }}">{{ modelingExercise.diagramType }}</td>
+                        <td class="d-md-table-cell"><jhi-exercise-categories [exercise]="modelingExercise" /></td>
+                        <td class="text-end">
+                            <div class="btn-group flex-btn-group-container">
+                                <!-- Participations -->
+                                @if (modelingExercise.isAtLeastTutor) {
+                                    <a
+                                        [routerLink]="['/course-management', courseId, 'modeling-exercises', modelingExercise.id, 'participations']"
+                                        class="btn btn-primary btn-sm me-1"
+                                    >
+                                        <fa-icon [icon]="farListAlt" />
+                                        <span class="d-none d-md-inline" jhiTranslate="artemisApp.exercise.participations"></span>
+                                    </a>
+                                }
+                                <!-- Scores -->
+                                @if (modelingExercise.isAtLeastTutor) {
+                                    <a
+                                        [routerLink]="['/course-management', modelingExercise.course?.id, 'modeling-exercises', modelingExercise.id, 'scores']"
+                                        class="btn btn-info btn-sm me-1"
+                                    >
+                                        <fa-icon [icon]="faTable" />
+                                        <span class="d-none d-md-inline" jhiTranslate="entity.action.scores"></span>
+                                    </a>
+                                }
+                                <!-- Example Submission -->
+                                @if (modelingExercise.isAtLeastEditor) {
+                                    <a
+                                        [routerLink]="['/course-management', courseId, 'modeling-exercises', modelingExercise.id, 'example-submissions']"
+                                        class="btn btn-success btn-sm me-1"
+                                    >
+                                        <fa-icon [icon]="faBook" />
+                                        <span class="d-none d-md-inline" jhiTranslate="entity.action.exampleSubmissions"></span>
+                                    </a>
+                                }
+                                <!-- Teams -->
+                                @if (modelingExercise.teamMode && modelingExercise.isAtLeastTutor) {
+                                    <a
+                                        [routerLink]="['/course-management', modelingExercise.course?.id, 'exercises', modelingExercise.id, 'teams']"
+                                        class="btn btn-primary btn-sm me-1"
+                                    >
+                                        <fa-icon [icon]="faUsers" />
+                                        <span class="d-none d-md-inline" jhiTranslate="artemisApp.exercise.teams"></span>
+                                    </a>
+                                }
+                                <!-- Edit -->
+                                @if (modelingExercise.isAtLeastEditor) {
+                                    <a
+                                        [routerLink]="['/course-management', modelingExercise.course?.id, 'modeling-exercises', modelingExercise.id, 'edit']"
+                                        class="btn btn-warning btn-sm me-1"
+                                    >
+                                        <fa-icon [icon]="faWrench" />
+                                        <span class="d-none d-md-inline" jhiTranslate="entity.action.edit"></span>
+                                    </a>
+                                }
+                                <!-- Delete -->
+                                @if (modelingExercise.isAtLeastInstructor) {
+                                    <button
+                                        id="delete-exercise"
+                                        jhiDeleteButton
+                                        [entityTitle]="modelingExercise.title || ''"
+                                        deleteQuestion="artemisApp.exercise.delete.question"
+                                        deleteConfirmationText="artemisApp.exercise.delete.typeNameToConfirm"
+                                        (delete)="deleteModelingExercise(modelingExercise.id!)"
+                                        [dialogError]="dialogError$"
+                                    >
+                                        <fa-icon [icon]="faTrash" />
+                                    </button>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        @if (selectedExercises.length > 0) {
+            <div>
+                @if (course.isAtLeastInstructor) {
+                    <button
+                        jhiDeleteButton
+                        [entityTitle]="'Delete All Modeling Exercises'"
+                        deleteQuestion="artemisApp.exerciseActions.deleteMultipleExercisesQuestion"
+                        (delete)="deleteMultipleExercises(selectedExercises, modelingExerciseService)"
+                        [dialogError]="dialogError$"
+                        id="delete-all-quiz"
+                        class="mb-1"
+                    >
+                        <fa-icon [icon]="faTrash" />
+                    </button>
+                }
+            </div>
+        }
+    </div>
+}

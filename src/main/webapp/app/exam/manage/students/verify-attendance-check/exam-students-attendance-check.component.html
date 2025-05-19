@@ -1,0 +1,105 @@
+<div>
+    @if (isLoading) {
+        <div class="d-flex justify-content-center">
+            <div class="spinner-border" role="status">
+                <span class="sr-only" jhiTranslate="loading"></span>
+            </div>
+        </div>
+    } @else {
+        <div class="d-flex border-bottom pb-2 mt-3">
+            @if (!hasExamStarted) {
+                <div>
+                    <h3><span class="text-white badge bg-danger" [jhiTranslate]="'artemisApp.examManagement.examStudents.examNotStarted'">Exam have not started yet!</span></h3>
+                </div>
+            } @else {
+                @if (allExamUsersAttendanceCheck && allExamUsersAttendanceCheck.length > 0) {
+                    <div>
+                        <span [jhiTranslate]="'artemisApp.examManagement.examStudents.notCheckedStudents'">Students who did not sign</span>:
+                        <span class="badge bg-danger text-white ms-1 px-2" id="#registered-users"> {{ allExamUsersAttendanceCheck.length }}</span>
+                    </div>
+                }
+                @if (!allExamUsersAttendanceCheck || allExamUsersAttendanceCheck.length === 0) {
+                    <div>
+                        <span class="fs-3" [jhiTranslate]="'artemisApp.examManagement.examStudents.allStudentsCheckedPassed'">All students passed</span>
+                        <fa-icon [icon]="faCheck" style="color: green" class="fa-2x ms-1" />
+                    </div>
+                }
+            }
+        </div>
+    }
+    <div class="row"></div>
+    <br />
+    @if (allExamUsersAttendanceCheck.length > 0 && !isLoading) {
+        <div class="table-responsive" id="exams-table">
+            <table class="table table-striped">
+                <thead>
+                    <tr jhiSort [(predicate)]="predicate" [(ascending)]="ascending" (sortChange)="sortRows()">
+                        <th class="d-md-table-cell" jhiSortBy="id">
+                            <span jhiTranslate="global.field.id"></span>
+                            <fa-icon [icon]="faSort" />
+                        </th>
+                        <th></th>
+                        <th class="d-md-table-cell" jhiSortBy="login">
+                            <span jhiTranslate="artemisApp.examManagement.examStudents.login"></span>
+                            <fa-icon [icon]="faSort" />
+                        </th>
+                        <th class="d-md-table-cell" jhiSortBy="registrationNumber">
+                            <span jhiTranslate="artemisApp.examManagement.examStudents.registrationNumber"></span>
+                            <fa-icon [icon]="faSort" />
+                        </th>
+                        <th class="d-md-table-cell">
+                            <span jhiTranslate="artemisApp.examManagement.examStudents.attendanceChecks"></span>
+                        </th>
+                        <th class="d-md-table-cell">
+                            <span jhiTranslate="artemisApp.studentExams.started"></span>
+                        </th>
+                        <th class="d-md-table-cell">
+                            <span jhiTranslate="artemisApp.studentExams.submitted"></span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (examUser of allExamUsersAttendanceCheck; track examUser) {
+                        <tr>
+                            <td class="d-md-table-cell">
+                                <span>
+                                    {{ examUser.id }}
+                                </span>
+                            </td>
+                            <td class="d-md-table-cell">
+                                <img class="img-fluid" width="60" [src]="examUser.studentImagePath ? addPublicFilePrefix(examUser.studentImagePath) : MISSING_IMAGE" />
+                            </td>
+                            <td class="d-md-table-cell">
+                                <span>
+                                    {{ examUser.login }}
+                                </span>
+                            </td>
+                            <td class="d-md-table-cell">
+                                <span>
+                                    {{ examUser.registrationNumber }}
+                                </span>
+                            </td>
+                            <td class="d-md-table-cell">
+                                @if (allExamUsersAttendanceCheck.length === 0 && examUser?.signingImagePath) {
+                                    <img class="img-fluid" width="60" [src]="addPublicFilePrefix(examUser.signingImagePath)" />
+                                } @else {
+                                    <h3>
+                                        <span class="m-2">
+                                            <fa-icon class="text-danger" [icon]="faXmark" />
+                                        </span>
+                                    </h3>
+                                }
+                            </td>
+                            <td class="d-md-table-cell">
+                                <span jhiTranslate="{{ examUser?.started ? 'global.generic.yes' : 'global.generic.no' }}"></span>
+                            </td>
+                            <td class="d-md-table-cell">
+                                <span jhiTranslate="{{ examUser?.submitted ? 'global.generic.yes' : 'global.generic.no' }}"></span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

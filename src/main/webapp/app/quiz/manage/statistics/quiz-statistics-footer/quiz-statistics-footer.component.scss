@@ -1,0 +1,34 @@
+.quiz-statistic-footer {
+    position: fixed;
+    height: 60px;
+    bottom: 4vh;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    background: var(--quiz-participation-footer-background);
+    box-shadow: 0 0 3px var(--quiz-participation-footer-box-shadow);
+
+    .container {
+        height: 100%;
+
+        .quiz-footer-content,
+        .edit-quiz-footer-content {
+            .form-group {
+                justify-content: center;
+
+                .dropup {
+                    text-align: center;
+                    width: 100%;
+                }
+
+                @media (max-width: 991.98px) {
+                    padding-top: 10px;
+                }
+            }
+        }
+    }
+}
+
+#remaining-time > * {
+    width: 100%;
+}

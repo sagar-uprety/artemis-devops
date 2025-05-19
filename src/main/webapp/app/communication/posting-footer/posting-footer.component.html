@@ -1,0 +1,43 @@
+@if (showAnswers() && sortedAnswerPosts().length) {
+    <div class="d-flex align-items-center mb-1 mx-3">
+        <div class="fs-x-small fw-900 me-2">
+            {{
+                sortedAnswerPosts().length === 1
+                    ? ('artemisApp.metis.singleAnswer' | artemisTranslate)
+                    : ('artemisApp.metis.multipleAnswers' | artemisTranslate: { number: sortedAnswerPosts().length })
+            }}
+        </div>
+        <div class="flex-grow-1">
+            <hr class="m-0" />
+        </div>
+    </div>
+    <div class="list-answer-post" [ngClass]="{ 'ms-4': !isThreadSidebar() }">
+        @for (group of groupedAnswerPosts; track trackGroupByFn($index, group)) {
+            @for (answerPost of group.posts; track trackPostByFn($index, answerPost)) {
+                <jhi-answer-post
+                    [lastReadDate]="lastReadDate()"
+                    [isReadOnlyMode]="readOnlyMode()"
+                    [posting]="answerPost"
+                    [isConsecutive]="answerPost.isConsecutive || false"
+                    [isLastAnswer]="isLastPost(group, answerPost)"
+                    [isCommunicationPage]="isCommunicationPage()"
+                    [isThreadSidebar]="isThreadSidebar()"
+                    (openPostingCreateEditModal)="createAnswerPostModal.open()"
+                    (userReferenceClicked)="userReferenceClicked.emit($event)"
+                    (channelReferenceClicked)="channelReferenceClicked.emit($event)"
+                    [hasChannelModerationRights]="hasChannelModerationRights()"
+                />
+            }
+        }
+    </div>
+}
+<div class="new-reply-inline-input" [ngClass]="{ 'ms-4 my-3': !isCommunicationPage() && showAnswers() }">
+    <!-- rendered during the first reply to a post -->
+    <ng-container #createEditAnswerPostContainer />
+    <jhi-answer-post-create-edit-modal
+        #createAnswerPostModal
+        [posting]="createdAnswerPost"
+        [createEditAnswerPostContainerRef]="containerRef"
+        (onCreate)="createdAnswerPost = createEmptyAnswerPost(); showAnswers()"
+    />
+</div>

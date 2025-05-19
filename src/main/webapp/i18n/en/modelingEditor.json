@@ -1,0 +1,75 @@
+{
+    "artemisApp": {
+        "modelingEditor": {
+            "title": "Modeling Editor",
+            "maxScore": "<strong>Max. Points: {{maxScore}}</strong>",
+            "saveSuccessful": "Your diagram was saved successfully!",
+            "allSaved": "All changes saved",
+            "unsavedChanges": "Unsaved changes",
+            "saving": "Saving...",
+            "submitSuccessful": "Your diagram was submitted successfully! You may submit again or wait for your feedback.",
+            "submitSuccessfulWithAssessment": "Your diagram was submitted successfully! You may no longer edit your diagram. Your feedback is shown below.",
+            "submitDueDateMissed": "Your diagram was submitted successfully! You may submit again or wait for your feedback. As you missed the due date, your score will not be counted.",
+            "empty": "Unable to submit an empty diagram.",
+            "fullscreen": {
+                "enterButtonText": "Fullscreen",
+                "exitButtonText": "Exit Fullscreen",
+                "tooltip": "Fullscreen"
+            },
+            "autoSubmit": "The exercise has ended. You may no longer edit your diagram.",
+            "newAssessment": "A new assessment for your submission is available.",
+            "error": "An error occurred. Please try again later.",
+            "assessment": {
+                "title": "Assessment",
+                "noAssessment": "There is no assessment available yet.",
+                "instructions": "Select entities and/or associations in the editor to filter the assessment.",
+                "element": "Element",
+                "score": "Points"
+            },
+            "helpModal": {
+                "help": "Help",
+                "title": "How to use the modeling editor",
+                "createElement": {
+                    "title": "Add Elements",
+                    "text": "To add an element, simply drag and drop one of the elements from the right side into the editor area on the left side."
+                },
+                "createRelationship": {
+                    "title": "Add Relationships",
+                    "text": "To add a relationship, select the source class with a single click and you will see four blue semicircles. Those are the possible connection points for relationships. Click and hold on one of those and drag it to another blue semicircle to create a relationship."
+                },
+                "updateElement": {
+                    "title": "Edit Elements/Relationships",
+                    "text": "To edit an element or relationship, double click it and a popup will open up in which you can edit its properties, e.g. name, type, attributes, methods, etc."
+                },
+                "deleteElement": {
+                    "title": "Delete Elements/Relationships",
+                    "text": "To delete an element or relationship, select it with a single click and either press <code>Delete</code> or <code>Backspace</code> on your keyboard."
+                },
+                "moveElement": {
+                    "title": "Move Elements",
+                    "text": "To move an element, either select it with a single click and use your keyboard arrow keys or drag and drop it."
+                },
+                "resizeElement": {
+                    "title": "Resize Elements",
+                    "text": "To resize an element, drag and drop the right bottom corner of the element."
+                },
+                "reconnectRelationship": {
+                    "title": "Move Relationships",
+                    "text": "To move a relationship, drag and drop one of its line ends."
+                },
+                "select": {
+                    "title": "Multi-Selection",
+                    "text": "When selecting elements or relationships, you can keep your <code>Shift</code> button pressed to add the element to your current selection. With <code>Ctrl + A</code> you can select all available elements."
+                },
+                "duplicate": {
+                    "title": "Duplicate Elements",
+                    "text": "With <code>Ctrl + C</code> you can copy the currently selected elements with all their properties. <code>Ctrl + V</code> creates a copy of previously copied elements."
+                },
+                "undo": {
+                    "title": "Undo & Redo",
+                    "text": "With <code>Ctrl + Z</code> and <code>Ctrl + Shift + Z</code> you can undo and redo your changes."
+                }
+            }
+        }
+    }
+}

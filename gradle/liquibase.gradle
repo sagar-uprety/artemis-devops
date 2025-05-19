@@ -1,0 +1,95 @@
+import org.gradle.internal.os.OperatingSystem
+
+configurations {
+    liquibaseRuntime.extendsFrom sourceSets.main.compileClasspath
+}
+
+dependencies {
+    implementation("org.liquibase:liquibase-core:${liquibase_version}") {
+        exclude group: 'com.opencsv', module: 'opencsv'
+    }
+    liquibaseRuntime "org.liquibase:liquibase-core:${liquibase_version}"
+    // Dependency required to parse options. Refer to https://github.com/liquibase/liquibase-gradle-plugin/tree/Release_2.2.0#news.
+    liquibaseRuntime "info.picocli:picocli:4.7.7"
+
+    liquibaseRuntime "org.liquibase.ext:liquibase-hibernate6:${liquibase_version}"
+    liquibaseRuntime "com.mysql:mysql-connector-j:${mysql_version}"
+    liquibaseRuntime "org.liquibase.ext:liquibase-hibernate6:${liquibase_version}"
+}
+
+ext.isWindows = OperatingSystem.current().isWindows()
+
+if (isWindows) {
+    tasks.register("pathingLiquibaseJar", Jar) {
+        dependsOn configurations.liquibaseRuntime
+        archiveAppendix = "pathingLiquibase"
+
+        doFirst {
+            manifest {
+                attributes "Class-Path": (sourceSets.main.runtimeClasspath + configurations.liquibaseRuntime).collect {
+                    it.toURI().toURL().toString().replaceFirst(/file:\/+/, "/")
+                }.join(" ")
+            }
+        }
+    }
+}
+
+tasks.register("initPaths", {
+    group = "liquibase"
+    dependsOn tasks.named("compileJava")
+    if (isWindows) {
+        dependsOn tasks.named("pathingLiquibaseJar")
+    }
+})
+
+def liquibaseCommand(command) {
+    tasks.register("runLiquibaseCommand", JavaExec) {
+        if (isWindows) {
+            classpath tasks.named("pathingLiquibaseJar").get().outputs.files
+        } else {
+            classpath sourceSets.main.runtimeClasspath
+            classpath configurations.liquibaseRuntime
+        }
+        mainClass = "liquibase.integration.commandline.LiquibaseCommandLine"
+
+        args = [
+            "--changeLogFile=src/main/resources/config/liquibase/changelog/" + buildTimestamp() +"_changelog.xml",
+            "--referenceUsername=root",
+            "--referencePassword=",
+            // we need an empty database to compare with for the creation of the new initial schema
+            "--referenceUrl=jdbc:mysql://localhost:3306/ArtemisEmpty?&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC",
+            "--username=root",
+            "--password=",
+            "--url=jdbc:mysql://localhost:3306/Artemis?&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC",
+            "--driver=com.mysql.cj.jdbc.Driver",
+            command
+        ]
+    }.get().exec()
+}
+
+tasks.register("liquibaseDiffChangeLog", {
+    dependsOn tasks.named("initPaths")
+    doLast {
+        liquibaseCommand("diffChangeLog")
+    }
+})
+
+tasks.register("liquibaseClearChecksums", {
+    dependsOn tasks.named("initPaths")
+    doLast {
+        liquibaseCommand("clearChecksums")
+    }
+})
+
+tasks.register("liquibaseGenerateChangelog", {
+    dependsOn tasks.named("initPaths")
+    doLast {
+        liquibaseCommand("generateChangeLog")
+    }
+})
+
+static def buildTimestamp() {
+    def date = new Date()
+    def formattedDate = date.format("yyyyMMddHHmmss")
+    return formattedDate
+}

@@ -1,0 +1,31 @@
+.container {
+    position: relative;
+}
+
+.chat-widget {
+    position: fixed;
+    top: -20px;
+    left: 0;
+    width: 330px;
+    height: 430px;
+    background-color: var(--iris-chat-widget-background);
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.4);
+    border-radius: var(--bs-border-radius-lg);
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-widget-top-resize-area {
+    position: absolute;
+    height: 5px;
+    width: 100%;
+    z-index: 10;
+}
+
+.ng-draggable {
+    cursor: grab;
+}
+
+.ng-dragging {
+    cursor: grabbing;
+}

@@ -1,0 +1,75 @@
+{
+    "artemisApp": {
+        "exampleSubmission": {
+            "home": {
+                "title": "Beispielabgaben",
+                "editor": "Beispielabgabe-Editor",
+                "assessmentTraining": "Das ist ein Beurteilungstraining"
+            },
+            "legend": {
+                "title": "Legende",
+                "positiveScore": "Positive Punktzahl",
+                "negativeScore": "Negative Punktzahl",
+                "incorrectAssessment": "Falsche Beurteilung",
+                "feedbackWithoutScore": "Feedback ohne Punktzahl"
+            },
+            "feedback": {
+                "CORRECT": "Richtiges Feedback 👍",
+                "INCORRECT_SCORE": "Falsche Punktzahl",
+                "UNNECESSARY_FEEDBACK": "Redundantes Feedback",
+                "MISSING_GRADING_INSTRUCTION": "Fehlende Bewertungsanweisung",
+                "INCORRECT_GRADING_INSTRUCTION": "Falsche Bewertungsanweisung",
+                "EMPTY_NEGATIVE_FEEDBACK": "Feedback ist notwendig für negative Punktzahl"
+            },
+            "submissionValidation": {
+                "missing": "Zu wenig Feedback gegeben. In der Musterbewertung wurde an mehr Stellen Feedback gegeben.",
+                "wrong": "Falsche Beurteilung. Es gibt {{mistakeCount}} Fehler.\nBitte überprüfe die Bewertungskriterien und reiche deine verbesserte Bewertung ein."
+            },
+            "correctTutorAssessment": "Herzlichen Glückwunsch! Das ist eine gute Beurteilung!",
+            "submitSuccessful": "Deine Beispielabgabe wurde eingereicht.",
+            "saveSuccessful": "Deine Beispielabgabe wurde gespeichert.",
+            "readSuccessfully": "Du hast die Beispielabgabe erfolgreich gelesen und verstanden.",
+            "createNew": "Neu erstellen",
+            "pageHeader": "Beispiel für eine Textvorlage zur Übung",
+            "usedForTutorial": "In Bewertungstraining verwenden",
+            "assessmentTraining": "Bewertungstraining",
+            "selectModel": "Wähle einen Bewertungstrainings-Modus aus",
+            "selectModelExplanation": "Wähle einen Bewertungstrainings-Modus aus. Dieser bestimmt wie die Tutor:innen nachweisen, dass sie die Beispielbewertung verstanden haben.",
+            "readAndConfirm": "Lesen und bestätigen",
+            "assessCorrectly": "Richtig bewerten",
+            "createNewSubmission": "Neue Beispielabgabe erstellen",
+            "editExampleSubmission": "Beispielabgabe bearbeiten",
+            "modelElementHint": "Tipp: Fälschlicherweise nicht bewertete Modell-Elemente sind mit einem blauen Hintergrund gekennzeichnet.",
+            "textHint": "Tipp: Textblöcke, die du bewerten musst, sind mit einem blauen Hintergrund gekennzeichnet.",
+            "editExampleSubmissionConfirmationQuestion": "Bist du sicher, dass du die Beispielabgabe bearbeiten möchtest? Die aktuelle Bewertung wird dauerhaft gelöscht und du musst die Abgabe erneut bewerten.",
+            "updateExampleSubmission": "Beispielabgabe aktualisieren",
+            "problemStatement": "Problemstellung",
+            "sampleSolution": "Beispiellösung",
+            "exampleAssessment": "Beispielbewertung",
+            "createNewAssessment": "Neue Bewertung anlegen",
+            "saveNewAssessment": "Neue Bewertung speichern",
+            "updateAssessment": "Bewertung aktualisieren",
+            "youNeedToCreate": "Du musst die Beispielabgabe erstellen, bevor du die Beispielbewertung erstellen kannst.",
+            "score": "Punktzahl",
+            "submitAssessment": "Bewertung einreichen",
+            "readAndUnderstood": "Ich habe das Beispiel gelesen und verstanden.",
+            "exampleSubmission": "Beispielabgabe",
+            "exampleSubmissions": "Beispielabgaben für Bewertungstraining",
+            "assessmentInstruction": "Doppelklicke auf ein Element im Modell, um dessen Bewertung zu öffnen und zu bearbeiten.",
+            "deleted": "Beispielabgabe gelöscht",
+            "assessmentExplanation": "Erklärung zur Beispielbewertung",
+            "assessmentExplanationInfo": "Zusätzliche Erklärung zu dieser Beispielbewertung",
+            "useAsExampleSubmission": "Als Beispielabgabe verwenden",
+            "useAsExampleSubmissionLabel": "Als Beispielabgabe verwenden",
+            "searchSubmission": "Suche nach Einreichung",
+            "submissionSize": "Einreichungsgröße",
+            "textSubmissionSizeHint": "Diese Zahl gibt die Anzahl der Wörter im Text an.",
+            "modelingSubmissionSizeHint": "Diese Zahl gibt die Anzahl der im Modell verwendeten Elemente an.",
+            "exampleAssessmentCreated": "Beispielbewertung Erstellt",
+            "exampleAssessmentWarning": "Du musst die Bewertung abschließen, um diese Einreichung im Bewertungstraining zu verwenden."
+        },
+        "tutorParticipation": {
+            "deleted": "Die Tutorteilnahme wurde erfolgreich gelöscht"
+        }
+    }
+}

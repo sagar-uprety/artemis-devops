@@ -1,0 +1,385 @@
+{
+    "global": {
+        "title": "Artemis",
+        "browsehappy": "You are using an <strong>outdated</strong> browser. Please <a href=\"https://browsehappy.com/?locale=en\">update your browser</a> to improve your experience.",
+        "generic": {
+            "yes": "Yes",
+            "no": "No",
+            "you": "You",
+            "emptyList": "No items available",
+            "unset": "Unset",
+            "create": "Create",
+            "start": "Start",
+            "edit": "Edit",
+            "copy": "Copy",
+            "copied": "Copied",
+            "new": "New"
+        },
+        "importTable": {
+            "searchPlaceholder": "Search"
+        },
+        "menu": {
+            "home": "Home",
+            "overview": "Course Overview",
+            "courses": "Courses",
+            "course": "Course Management",
+            "entities": {
+                "main": "Entities",
+                "course": "Course",
+                "exercise": "Exercise",
+                "textExercise": "Text Exercise",
+                "fileUploadExercise": "File Upload Exercise",
+                "programmingExercise": "Programming Exercise",
+                "modelingExercise": "Modeling Exercise",
+                "quizExercise": "Quiz Exercise",
+                "lecture": "Lecture",
+                "competency": "Competency",
+                "ltiOutcomeUrl": "Lti Outcome Url",
+                "submittedAnswer": "Submitted Answer",
+                "quizQuestion": "Question",
+                "multipleChoiceQuestion": "Multiple Choice Question",
+                "answerOption": "Answer Option",
+                "multipleChoiceSubmittedAnswer": "Multiple Choice Submitted Answer",
+                "dragAndDropQuestion": "Drag And Drop Question",
+                "dropLocation": "Drop Location",
+                "dragItem": "Drag Item",
+                "participation": "Participation",
+                "exerciseResult": "Exercise Result",
+                "feedback": "Feedback",
+                "submission": "Submission",
+                "modelingSubmission": "Modeling Submission",
+                "quizSubmission": "Quiz Submission",
+                "programmingSubmission": "Programming Submission",
+                "textSubmission": "Text Submission",
+                "fileUploadSubmission": "File Upload Submission",
+                "dragAndDropSubmittedAnswer": "Drag And Drop Submitted Answer",
+                "dragAndDropAssignment": "Drag And Drop Assignment",
+                "quizPointStatistic": "Quiz Point Statistic",
+                "quizQuestionStatistic": "Question Statistic",
+                "multipleChoiceQuestionStatistic": "Multiple Choice Question Statistic",
+                "dragAndDropQuestionStatistic": "Drag And Drop Question Statistic",
+                "quizStatisticCounter": "Statistic Counter",
+                "pointCounter": "Point Counter",
+                "answerCounter": "Answer Counter",
+                "dropLocationCounter": "Drop Location Counter",
+                "apollonDiagram": "Apollon Diagram",
+                "dragAndDropMapping": "Drag And Drop Mapping",
+                "shortAnswerQuestionStatistic": "Short Answer Question Statistic",
+                "shortAnswerSpotCounter": "Short Answer Spot Counter",
+                "shortAnswerQuestion": "Short Answer Question",
+                "shortAnswerSpot": "Short Answer Spot",
+                "shortAnswerSolution": "Short Answer Solution",
+                "shortAnswerSubmittedAnswer": "Short Answer Submitted Answer",
+                "shortAnswerSubmittedText": "Short Answer Submitted Text",
+                "shortAnswerMapping": "Short Answer Mapping",
+                "programmingExerciseTestCase": "Programming Exercise Test Case",
+                "exerciseHint": "Exercise Hint",
+                "exerciseTypes": {
+                    "programming": "Programming",
+                    "modeling": "Modeling",
+                    "text": "Text",
+                    "fileUpload": "File Upload",
+                    "quiz": "Quiz"
+                },
+                "metis": {
+                    "post": "Post",
+                    "answerPost": "Reply"
+                },
+                "messages": {
+                    "conversation": "Conversation",
+                    "conversationParticipant": "Conversation Details"
+                }
+            },
+            "account": {
+                "main": "Account",
+                "profile": "Profile",
+                "settings": "Settings",
+                "password": "Password",
+                "sessions": "Sessions",
+                "login": "Sign in",
+                "loginWithPasskey": "Sign in with a passkey",
+                "logout": "Sign out",
+                "register": "Register"
+            },
+            "admin": {
+                "main": "Server Administration",
+                "upcomingExamsAndExercises": "Upcoming exams & exercises",
+                "userManagement": "User management",
+                "organizationManagement": "Organization management",
+                "systemNotifications": "System notifications",
+                "featureToggles": "Feature Toggles",
+                "statistics": "User statistics",
+                "metrics": "Metrics",
+                "health": "Health",
+                "configuration": "Configuration",
+                "logs": "Logs",
+                "audits": "Audits",
+                "apidocs": "API",
+                "privacyStatement": "Privacy Statement",
+                "imprint": "Imprint",
+                "database": "Database",
+                "iris": "Iris Settings",
+                "lti": "LTI Configuration",
+                "standardizedCompetencies": "Standardized Competencies",
+                "cleanupService": "Cleanup Service",
+                "lectureTranscription": "Lecture Transcription"
+            },
+            "language": "Language",
+            "settings": "Settings"
+        },
+        "form": {
+            "username": "Login or email",
+            "firstname": "First name",
+            "firstname.placeholder": "First name",
+            "lastname": "Last name",
+            "lastname.placeholder": "Last name",
+            "username.placeholder": "Login or email",
+            "username.tumPlaceholder": "e.g. go42tum / example@tum.de",
+            "currentpassword": "Current password",
+            "currentpassword.placeholder": "Current password",
+            "newpassword": "New password",
+            "newpassword.placeholder": "New password",
+            "confirmpassword": "New password confirmation",
+            "confirmpassword.placeholder": "Confirm the new password",
+            "email": "Email",
+            "email.placeholder": "Your email",
+            "email.pattern": "Please use an email with the following pattern:",
+            "cancel": "Cancel",
+            "confirm": "Confirm",
+            "refresh": "Refresh",
+            "invalidInput": "Invalid Input"
+        },
+        "messages": {
+            "info": {
+                "authenticated": {
+                    "prefix": "If you want to ",
+                    "link": "sign in",
+                    "suffix": ", you can try the default accounts:<br>- Administrator (login=\"admin\" and password=\"admin\") <br>- User (login=\"user\" and password=\"user\")."
+                },
+                "register": {
+                    "noaccount": "Don't have an account yet?",
+                    "link": "Register a new account"
+                }
+            },
+            "error": {
+                "dontmatch": "The password and its confirmation do not match!"
+            },
+            "validate": {
+                "oldpassword": {
+                    "required": "Please enter your current password."
+                },
+                "newpassword": {
+                    "required": "Your new password is required.",
+                    "minlength": "Your password is required to be at least {{min}} characters.",
+                    "maxlength": "Your password cannot be longer than {{max}} characters.",
+                    "strength": "Password strength:"
+                },
+                "confirmpassword": {
+                    "required": "Your confirmation password is required.",
+                    "minlength": "Your confirmation password is required to be at least {{min}} characters.",
+                    "maxlength": "Your confirmation password cannot be longer than {{max}} characters."
+                },
+                "email": {
+                    "required": "Your email is required.",
+                    "invalid": "Your email is invalid.",
+                    "minlength": "Your email is required to be at least 5 characters.",
+                    "maxlength": "Your email cannot be longer than 100 characters.",
+                    "pattern": "Your email does not follow the required pattern."
+                }
+            }
+        },
+        "field": {
+            "id": "ID"
+        },
+        "ribbon": {
+            "dev": "Development",
+            "test": "Test Server"
+        },
+        "item-count": "Showing {{first}} - {{second}} of {{total}} items."
+    },
+    "entity": {
+        "actions": "Actions",
+        "quickActions": "Quick Actions",
+        "controlCenter": "Control Center",
+        "action": {
+            "add": "Add",
+            "addblob": "Add blob",
+            "addimage": "Add image",
+            "back": "Back",
+            "cancel": "Cancel",
+            "units": "Units",
+            "dashboard": "Dashboard",
+            "exportRepos": "Download Repositories",
+            "delete": "Delete",
+            "deleteQuestion": "Are you sure you want to delete?",
+            "noButtonTextDelete": "",
+            "unlink": "Unlink",
+            "confirm": "Confirm",
+            "download": "Download",
+            "edit": "Edit",
+            "connect": "Connect",
+            "editSelected": "Edit selected",
+            "editInEditor": "Edit in editor",
+            "editBuildPlan": "Edit build plan",
+            "editEntity": "Edit {{entity}}",
+            "exampleSubmissions": "Example submissions",
+            "generate": "Generate",
+            "open": "Open",
+            "save": "Save",
+            "saving": "Saving...",
+            "view": "View",
+            "preview": "Preview",
+            "visual": "Visual",
+            "cleanup": "Cleanup",
+            "remove": "Remove",
+            "purge": "Purge",
+            "archive": "Archive",
+            "submit": "Submit",
+            "continueSubmission": "Continue",
+            "viewTimeline": "View Timeline",
+            "hideTimeline": "Hide Timeline",
+            "submitTooltip": "You can submit multiple times until the exercise due date. Your last submission will count towards your score.",
+            "submitNoDueDateTooltip": "You can submit multiple times. Your last submission will count towards your score.",
+            "submitDueDateMissedTooltip": "The due date has passed. Your submissions will not be graded!",
+            "dueDateMissedTooltip": "The due date has passed. You may no longer submit any solutions!",
+            "submitDueDateMissed": "Submit (due date missed)",
+            "submitSuccessfulAlert": "Your submission was successful! You can change your submission or wait for your feedback.",
+            "submitDueDateMissedAlert": "Your submission was successful! You can change your submission or wait for your feedback. As you missed the due date, your score will not be counted.",
+            "retry": "Retry",
+            "reset": "Reset",
+            "re-evaluate": "Re-evaluate",
+            "close": "Close",
+            "finish": "Finish",
+            "import": "Import",
+            "to-import": "Import",
+            "export": "Export",
+            "lecture": "Lectures",
+            "attachments": "Attachments",
+            "saveAttachment": "Save attachment",
+            "addAttachment": "Add attachment as lecture unit",
+            "assessmentDashboard": "Assessment",
+            "instructorDashboard": "Instructor Dashboard",
+            "exerciseDashboard": "Exercise Dashboard",
+            "newResult": "New Result",
+            "updateResult": "Update Result",
+            "viewResult": "View Result",
+            "cleanupBuildPlan": "Clean up Build Plan",
+            "exercise": "Exercises",
+            "scores": "Scores",
+            "exams": "Exams",
+            "hints": "Hints",
+            "addExternalSubmission": "Add External Submission",
+            "addAuxiliaryRepository": "Add Auxiliary Repository",
+            "toggleToUnsubmitted": "Change Student Exam to Unsubmitted",
+            "toggleToSubmitted": "Change Student Exam to Submitted",
+            "endNow": "End Now",
+            "ldap": "Sync from LDAP",
+            "notUndoable": "This action cannot be undone!",
+            "discardChanges": "Discard changes",
+            "goBack": "Go back",
+            "search": "Search",
+            "select": "Select",
+            "sendToIris": "Send To Iris",
+            "faq": "FAQ",
+            "show": "Show",
+            "addExercise": "Add exercise",
+            "addLecture": "Add lecture",
+            "addFaq": "Add FAQ",
+            "addExam": "Add exam",
+            "addStudent": "Add student",
+            "addTutor": "Add tutor",
+            "addEditor": "Add editor",
+            "addInstructor": "Add instructor"
+        },
+        "detail": {
+            "field": "Field",
+            "value": "Value"
+        },
+        "delete": {
+            "title": "Confirm delete operation"
+        },
+        "unlink": {
+            "title": "Confirm unlink operation"
+        },
+        "reset": {
+            "title": "Confirm reset operation"
+        },
+        "noButtonTextDelete": {
+            "title": "Confirm delete operation"
+        },
+        "endNow": {
+            "title": "Confirm end now operation"
+        },
+        "cleanup": {
+            "title": "Confirm cleanup operation"
+        },
+        "remove": {
+            "title": "Confirm remove operation"
+        },
+        "archive": {
+            "title": "Confirm archive operation"
+        },
+        "exportRepos": {
+            "title": "Export Repositories"
+        },
+        "resetProgrammingExercise": {
+            "title": "Reset Programming Exercise"
+        },
+        "validation": {
+            "required": "This field is required.",
+            "minlength": "This field is required to be at least {{ min }} characters.",
+            "maxlength": "This field cannot be longer than {{ max }} characters.",
+            "min": "This field must be at least {{ min }}.",
+            "max": "This field cannot be more than {{ max }}.",
+            "minbytes": "This field must be at least {{ min }} bytes.",
+            "maxbytes": "This field cannot be more than {{ max }} bytes.",
+            "pattern": "This field must fulfill the pattern {{ pattern }}.",
+            "number": "This field must be a number.",
+            "datetimelocal": "This field must be a date and time.",
+            "patternLogin": "This field may only contain letters, digits and e-mail addresses.",
+            "invalidPattern": "This field contains an invalid e-mail pattern."
+        },
+        "timeZoneWarning": "You are currently in the {{ timeZone }} time zone.",
+        "dateMissingOrNotValid": "'{{labelName}}' is missing/invalid",
+        "startDateError": "'Start of working time' should be between 'Visible from' and 'End of working time'",
+        "endDateError": "'End of working time' should be later than 'Start of working time'",
+        "visibleDateWarningError": "'Visible from' is set too early. We recommend setting it within 4 hours before the 'Start of working time'.",
+        "visibleDateWarningToolTip": "Setting the date too early may cause confusion and lead to premature access to exam materials. It is recommended to make the exam visible only a few hours before the start time."
+    },
+    "aboutUs": "About",
+    "contact": "Contact us",
+    "bug": "Report a bug",
+    "feature": "Request a feature",
+    "releases": "Releases",
+    "releaseNotes": "Release notes",
+    "feedback": "Feedback",
+    "justNow": "just now",
+    "pendingChanges": "WARNING: You have unsaved changes. Press Cancel to go back and save these changes, or OK to lose these changes.",
+    "overview": {
+        "training": "Quiz Training",
+        "title": "Course overview",
+        "aboutUs": "About",
+        "course": "Course details",
+        "lectures": "Lectures",
+        "competencies": "Competencies",
+        "learningPath": "Learning Path",
+        "tutorialGroups": "Tutorial Groups",
+        "dashboard": "Dashboard",
+        "exercise": "Exercise details",
+        "exercises": "Exercises",
+        "statistics": "Course statistics",
+        "exams": "Exams",
+        "communication": "Communication",
+        "archive": "Course archive",
+        "faq": "FAQ",
+        "plagiarismCases": "Plagiarism Cases",
+        "settings": "Settings",
+        "calendar": "Calendar"
+    },
+    "connectionStatus": {
+        "connected": "Connected",
+        "disconnected": "Disconnected"
+    },
+    "loading": "Loading...",
+    "completed": "Completed"
+}

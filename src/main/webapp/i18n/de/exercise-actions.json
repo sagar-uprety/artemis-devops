@@ -1,0 +1,80 @@
+{
+    "artemisApp": {
+        "exerciseActions": {
+            "practice": "Üben",
+            "openQuiz": "Quiz öffnen",
+            "startQuiz": "Quiz starten",
+            "resumeQuiz": "Quiz fortführen",
+            "viewSubmissions": "Abgabe ansehen",
+            "viewResults": "Ergebnis ansehen",
+            "statistics": "Quiz-Statistiken",
+            "startExercise": "Aufgabe starten",
+            "resumeExercise": "Aufgabe fortführen",
+            "requestManualFeedback": "Feedback anfragen",
+            "requestManualFeedbackTooltip": "Sendet eine Feedbackanfrage vor der Einreichungsfrist.",
+            "requestAutomaticFeedback": "AI Feedback anfragen",
+            "requestAutomaticFeedbackTooltip": "Das automatisch generierte Feedback kann Fehler beinhalten. Überprüfe wichtige Informationen.",
+            "resumeExercisePractice": "Üben von Aufgabe fortführen",
+            "resumeExerciseError": "Fehler beim Versuch die Aufgabe fortzuführen",
+            "openCodeEditor": "Programmiereditor öffnen",
+            "openPracticeCodeEditor": "Programmiereditor zum Üben öffnen",
+            "openGradedCodeEditor": "Programmiereditor öffnen",
+            "choseGradedMode": "Bewertete Teilnahme gewählt",
+            "openModelingEditor": "Modellierungseditor öffnen",
+            "importIntoIDE": "In deiner IDE öffnen",
+            "openOnlineIDE": "Online IDE öffnen",
+            "practiceMode": {
+                "title": "Übungsmodus",
+                "explanation": "Der Übungsmodus ermöglicht es dir nach der Einreichungsfrist zu Übungszwecken weiter an der Aufgabe zu arbeiten. Dies wird deine Bewertung nicht beeinflussen! Artemis wird dafür ein separates Repository aufsetzen, das du erneut clonen musst.",
+                "repositoryChoice": "Du hast bereits vor der Einreichungsfrist eine bewertete Abgabe gemacht. Daher hast du die Wahl, ob der Code im neu aufgesetzten Repository der aus dem Template-Repository der Aufgabe oder deiner bewerteten Abgabe sein soll.",
+                "practiceWithTemplate": "Üben mit Template-Repository",
+                "practiceWithGradedParticipation": "Üben mit bewerteter Abgabe"
+            },
+            "resetRepository": {
+                "label": "Repository zurücksetzen",
+                "titleGraded": "Bewertetes Repository zurücksetzen",
+                "titlePractice": "Übungs-Repository zurücksetzen",
+                "explanation": "Du kannst dein Repository auf den Ausgangszustand zurücksetzen und von dort aus weiterarbeiten. Dies überschreibt all deine Änderungen! Die bisherigen gepushten Änderungen bleiben aber weiterhin in der History des Repositories.",
+                "offlineIDEExplanation": "Nachdem du das Repository zurückgesetzt hast, musst du die Änderungen auf deinem PC pullen.",
+                "repositoryChoice": "Du hast bereits vor der Einreichungsfrist eine bewertete Abgabe gemacht. Daher hast du die Wahl, ob du dein Übungs-Repository auf das Template-Repository oder das Repository deiner bewerteten Abgabe zurücksetzen willst.",
+                "questionGraded": "Soll das bewertete Repository der Aufgabe <strong>{{ title }}</strong> wirklich zurückgesetzt werden?",
+                "questionPractice": "Soll das Übungs-Repository der Aufgabe <strong>{{ title }}</strong> wirklich zurückgesetzt werden?",
+                "typeNameToConfirm": "Bitte gib den Namen der Aufgabe zur Bestätigung ein.",
+                "resetToTemplate": "Zurücksetzen auf Template-Repository",
+                "resetToGradedParticipation": "Zurücksetzen auf bewertete Abgabe",
+                "success": "Repository erfolgreich zurückgesetzt. Du kannst die Aufgabe jetzt neu bearbeiten."
+            },
+            "practiceModeTooltip": "Der Übungsmodus ermöglicht es dir nach der Einreichungsfrist zu Übungszwecken weiter an der Aufgabe zu arbeiten. Dies beeinflusst deine Bewertung nicht! Artemis setzt dafür ein separates Repository auf, das du erneut clonen musst.",
+            "code": "Code",
+            "cloneRatedRepository": "Klone dein Repository für diese Aufgabe:",
+            "clonePracticeRepository": "Klone dein Repository zum Üben für diese Aufgabe:",
+            "cloneExerciseRepository": "Klone ein Repository für diese Aufgabe",
+            "cloneSourceTree": {
+                "button": "Im Git Client klonen",
+                "helpIcon": "Dies öffnet das Repository in Sourcetree oder Tower. Falls du diese nicht installiert hast, kannst du das Repository in deiner IDE oder dem Terminal klonen."
+            },
+            "ideButton": {
+                "openIn": "Öffnen in {{ ideName }}",
+                "helpIcon": "IDE kann in den Einstellungen festgelegt werden"
+            },
+            "goToBuildPlan": "Zum Build Plan gehen",
+            "openTextEditor": "Texteditor öffnen",
+            "copyUrl": "URL kopieren",
+            "copiedUrl": "URL kopiert",
+            "uploadFile": "Datei hochladen",
+            "viewTeam": "Team",
+            "sshKeyTip": "Um SSH zu nutzen, musst du {link:hier} einen SSH Schlüssel zu deinem Konto hinzufügen.",
+            "sshKeyExpiredTip": "Du hast abgelaufene SSH-Schlüssel. Möglicherweise musst du {link:hier} einen neuen SSH-Schlüssel zu deinem Konto hinzufügen.",
+            "vcsTokenTip": "Um mit einem VCS-Zugriffstoken auf das Repository zuzugreifen, musst du {link:hier} ein neues hinzufügen.",
+            "vcsTokenExpiredTip": "Dein VCS-Zugriffstoken ist abgelaufen. Erneuere es {link:hier}.",
+            "startExerciseBeforeStartDate": "Du kannst vor dem Startdatum nicht an der Aufgabe teilnehmen.",
+            "deleteMultipleExercisesQuestion": "Sollen die ausgewählten Aufgaben wirklich dauerhaft gelöscht werden?",
+            "externalLLMUsage": {
+                "popUpLabel": "Bestätigung der externen LLM-Verwendung",
+                "popUpMessage": "Indem du akzeptierst, bestätigst du, dass du mindestens 18 Jahre alt bist und damit einverstanden bist, dass deine Interaktionen mit Artemis sowie die dafür erforderlichen kontextbezogenen Daten, wie etwa dein Code, außerhalb des Rechenzentrums der Universität verarbeitet werden dürfen. Die Verarbeitung erfolgt in der Microsoft Azure Cloud gemäß den EU-Datenschutzstandards. Dabei werden alle Daten innerhalb der EU verarbeitet und nicht gespeichert.",
+                "accept": "Akzeptieren",
+                "decline": "Ablehnen"
+            }
+        }
+    }
+}

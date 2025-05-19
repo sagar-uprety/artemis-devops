@@ -1,0 +1,14 @@
+<jhi-lecture-unit-card
+    [courseId]="courseId()"
+    [lectureUnit]="lectureUnit()"
+    [icon]="faScroll"
+    [showViewIsolatedButton]="true"
+    [isPresentationMode]="isPresentationMode()"
+    (onCompletion)="toggleCompletion($event)"
+    (onCollapse)="toggleCollapse($event)"
+    (onShowIsolated)="handleIsolatedView()"
+>
+    @if (formattedContent()) {
+        <div class="markdown-preview" id="printContent" [innerHtml]="formattedContent()"></div>
+    }
+</jhi-lecture-unit-card>

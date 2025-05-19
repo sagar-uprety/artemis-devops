@@ -1,0 +1,76 @@
+.quiz-navigation {
+    .draganddropcolor-question {
+        background-color: var(--quiz-participation-footer-dnd-background) !important;
+    }
+    .multiplechoicecolor-question {
+        background-color: var(--quiz-participation-footer-mc-background) !important;
+    }
+    .shortanswercolor-question {
+        background-color: var(--quiz-participation-footer-sa-background) !important;
+    }
+    .changed-question {
+        background-color: var(--quiz-participation-footer-changed-background) !important;
+    }
+}
+
+.stepwizardquiz {
+    &__step {
+        .fa {
+            vertical-align: initial;
+        }
+
+        .btn {
+            cursor: help;
+            opacity: 1 !important;
+        }
+    }
+}
+
+.btn-circle {
+    width: 30px;
+    height: 30px;
+    text-align: center;
+    font-size: 12px;
+    font-family: Arial, Helvetica, sans-serif;
+    border-radius: 15px;
+    border-spacing: 5px;
+    padding: 6px 0;
+
+    &.btn-light {
+        border-color: #ffffff;
+    }
+}
+
+/* Additional styles to ensure the quiz content fills the space */
+.quiz-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+}
+
+.quiz-content {
+    flex: 1; /* Allow the content to grow and fill available space */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.quiz-question {
+    flex: 1; /* Allow the question to take up available space */
+    margin-bottom: 20px;
+}
+
+.quiz-options {
+    flex: 1; /* Allow the options to take up available space */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+@media print {
+    .quiz-container {
+        height: auto;
+        page-break-inside: avoid;
+    }
+}

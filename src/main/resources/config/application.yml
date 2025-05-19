@@ -1,0 +1,378 @@
+# ===================================================================
+# Spring Boot configuration.
+#
+# This configuration will be overridden by the Spring profile you use,
+# for example application-dev.yml if you use the "dev" profile.
+#
+# More information on profiles: https://www.jhipster.tech/profiles/
+# More information on configuration properties: https://www.jhipster.tech/common-application-properties/
+# ===================================================================
+
+# ===================================================================
+# Standard Spring Boot properties.
+# Full reference is available at:
+# http://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
+# ===================================================================
+
+logging:
+    level:
+        ROOT: INFO
+        de.tum.cit.aet.artemis: INFO
+        tech.jhipster: INFO
+        org.springframework.web.socket.config: INFO
+        liquibase: INFO
+        de.jplag.Submission: ERROR
+        de.jplag.logging: WARN
+        de.jplag.reporting: WARN
+    logback:
+        rollingpolicy:
+            max-history: 90
+            total-size-cap: "10GB"
+
+artemis:
+    version: #project.version#
+    file-upload-path: uploads
+    submission-export-path: exports
+    bcrypt-salt-rounds: 11 #default value, see application-artemis.yml for more information how to override and customize this value
+    external-system-request:
+        batch-size: 50  # wait the time below after 50 requests
+        batch-waiting-time: 30000   # in ms = 30s
+    iosAppId: "T7PP2KY2B6.de.tum.cit.ase.artemis"
+    androidAppPackage: "de.tum.cit.aet.artemis"
+    androidSha256CertFingerprints:
+      release: "D2:E1:A6:6F:8C:00:55:97:9F:30:2F:3D:79:A9:5D:78:85:1F:C5:21:5A:7F:81:B3:BF:60:22:71:EF:6F:60:24"
+      debug: "7F:CB:99:74:19:30:15:4B:86:4B:8A:73:B0:09:94:52:19:F6:BD:90:6A:7C:16:B1:76:37:AF:74:B1:48:3B:6C"
+
+    # activate the following line if you want to support push notifications for the mobile clients.
+    # More information about the TUM hosted hermes service can be found here: https://github.com/ls1intum/Hermes
+    # push-notification-relay: https://hermes.artemis.cit.tum.de
+
+    continuous-integration:
+        # Defines the used docker images for certain programming languages.
+        # For each language at least the `default` image has to be defined.
+        # This `default` option will be overridden by more specific project type
+        # definitions.
+        build:
+            default-docker-flags:
+                - flag: --cpus
+                  value: 2
+                # Set `memory-swap` and `memory` to the same value to turn off SWAP.
+                # See -> https://docs.docker.com/config/containers/resource_constraints/#--memory-swap-details
+                - flag: --memory
+                  value: 2g
+                - flag: --memory-swap
+                  value: 2g
+                - flag: --pids-limit
+                  value: 1000
+            images:
+                java:
+                    # possible overrides: maven, gradle
+                    default: "ls1tum/artemis-maven-template:java17-22"
+                    maven_blackbox: "ghcr.io/uni-passau-artemis/artemis-dejagnu:22"
+                kotlin:
+                    # possible overrides: maven, gradle
+                    default: "ls1tum/artemis-maven-template:java17-22"
+                empty:
+                    default: "ubuntu:24.04"
+                python:
+                    default: "ls1tum/artemis-python-docker:v1.1.0"
+                c:
+                    # possible overrides: gcc, fact
+                    default: "ls1tum/artemis-c-docker:v1.0.0"
+                    fact: "sharingcodeability/fact:v0.0.5"
+                haskell:
+                    default: "ghcr.io/uni-passau-artemis/artemis-haskell:v22.37.0"
+                vhdl:
+                    default: "ghcr.io/ls1intum/artemis-vhdl-docker:v1.0.0"
+                assembler:
+                    default: "ghcr.io/ls1intum/artemis-assembler-docker:v1.0.0"
+                swift:
+                    # possible overrides: xcode
+                    default: "ls1tum/artemis-swift-swiftlint-docker:swift5.9.2"
+                ocaml:
+                    default: "ls1tum/artemis-ocaml-docker:v1"
+                rust:
+                    default: "ghcr.io/ls1intum/artemis-rust-docker:v1.2.0"
+                javascript:
+                    default: "ghcr.io/ls1intum/artemis-javascript-docker:v1.1.0"
+                r:
+                    default: "ghcr.io/ls1intum/artemis-r-docker:v1.2.0"
+                bash:
+                    default: "ghcr.io/ls1intum/artemis-bash-docker:v1.0.0"
+                c_plus_plus:
+                    default: "ghcr.io/ls1intum/artemis-cpp-docker:v1.1.2"
+                c_sharp:
+                    default: "ghcr.io/ls1intum/artemis-csharp-docker:v1.0.1"
+                typescript:
+                    default: "ghcr.io/ls1intum/artemis-javascript-docker:v1.1.0"
+                go:
+                    default: "ghcr.io/ls1intum/artemis-go-docker:v1.0.0"
+                matlab:
+                    default: "mathworks/matlab:r2024b"
+                ruby:
+                    default: "ghcr.io/ls1intum/artemis-ruby-docker:v1.0.1"
+                dart:
+                    default: "ghcr.io/ls1intum/artemis-dart-docker:v1.1.0"
+
+        # The following properties are used to configure the Artemis build agent.
+        # The build agent is responsible for executing the buildJob to test student submissions.
+        build-agent:
+            # Name of the build agent. Only lowercase letters, numbers and hyphens are allowed. ([a-z0-9-]+)
+            short-name: "artemis-build-agent-1"
+            display-name: "Artemis Build Agent 1"
+
+    compatible-versions:
+      android:
+        min: "2.1.2"
+        recommended: "2.1.2"
+      ios:
+        min: "2.0.0"
+        recommended: "2.2.0"
+
+
+
+management:
+    endpoints:
+        web:
+            base-path: /management
+            exposure:
+                include:
+                  - configprops
+                  - env
+                  - health
+                  - info
+                  - jhimetrics
+                  - logfile
+                  - loggers
+                  - prometheus
+                  - threaddump
+    info:
+        git:
+            mode: full
+        java:
+            enabled: true
+        env:
+            enabled: true
+    health:
+        mail:
+            enabled: false # When using the MailService, configure an SMTP server and set this to true
+        ldap:
+            enabled: false # Disabled to prevent periodic health checks that lead to null pointer exceptions if the ldap is not configured or not active
+        config:
+            enabled: false # Disabled because we do not use a Spring Cloud Config Server
+    prometheus:
+        # Prometheus is the default metrics server
+        metrics:
+            export:
+                enabled: true
+                step: 60
+    metrics:
+        distribution:
+            percentiles-histogram:
+                all: true
+        tags:
+            application: ${spring.application.name}
+    observations:
+        http:
+            server:
+                requests:
+                    name: http.server.requests
+
+spring:
+    application:
+        name: Artemis
+    jmx:
+        enabled: false
+    cloud:
+        config:
+            import-check:
+                enabled: false
+    data:
+        jpa:
+            repositories:
+                bootstrap-mode: deferred
+    jpa:
+        open-in-view: false
+        show-sql: false
+        hibernate:
+            ddl-auto: none
+            naming:
+                physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+                implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
+        properties:
+            hibernate.id.new_generator_mappings: true
+            hibernate.connection.provider_disables_autocommit: true
+            hibernate.generate_statistics: false
+            hibernate.order_inserts: true
+            hibernate.order_updates: true
+            hibernate.query.fail_on_pagination_over_collection_fetch: true  # prevents issues, see https://vladmihalcea.com/hibernate-query-fail-on-pagination-over-collection-fetch
+            hibernate.query.in_clause_parameter_padding: true
+            hibernate.cache.use_second_level_cache: true
+            hibernate.cache.use_query_cache: false
+            hibernate.cache.region.factory_class: com.hazelcast.hibernate.HazelcastLocalCacheRegionFactory
+            hibernate.cache.use_minimal_puts: true
+            hibernate.cache.hazelcast.instance_name: Artemis
+            hibernate.cache.hazelcast.use_lite_member: true
+            # modify batch size as necessary
+            hibernate.jdbc.batch_size: 25
+            hibernate.jdbc.time_zone: UTC
+            hibernate.jdbc.lob.non_contextual_creation: true
+            # limit fetch depth to prevent queries from getting too large because of eager fetching
+            hibernate.max_fetch_depth: 2
+            jakarta.persistence.validation.mode: none # disable validation for faster startup
+    liquibase:
+        contexts: prod
+    messages:
+        basename: i18n/messages
+    main:
+        allow-bean-definition-overriding: false
+        allow-circular-references: false
+        lazy-initialization: true
+    task:
+        execution:
+            thread-name-prefix: artemis-task-
+            pool:
+                core-size: 2
+                max-size: 50
+                queue-capacity: 10000
+        scheduling:
+            thread-name-prefix: artemis-scheduling-
+            pool:
+                size: 2
+    threads:
+        virtual:
+            enabled: true
+    thymeleaf:
+        mode: HTML
+    output:
+        ansi:
+            enabled: always
+    servlet:
+        multipart:
+            max-file-size: 20MB # this should match the value in /webapp/app/shared/constants/input.constants.ts MAX_FILE_SIZE
+            max-request-size: 20MB
+    lifecycle:
+        timeout-per-shutdown-phase: 10
+    websocket:
+        broker:
+            username: guest
+            password: guest
+            addresses: "" # Comma separated list of hosts and ports of the brokers (e.g. "localhost:61613,localhost:61614")
+    hazelcast:
+        interface: "127.0.0.1" # The interface to bind to, if non is set, all interfaces will be bound
+        port: 5701 # The hazelcast port that this instance runs on and where other instances are expected
+        localInstances: false # Whether the other instances are expected locally (in dev mode) or external
+        phone:
+            home:
+                enabled: false
+        slow:
+            operation:
+                detector:
+                    enabled: true
+    beaninfo:
+        ignore: true
+
+hazelcast:
+    phone:
+        home:
+            enabled: false
+
+springdoc:
+  api-docs: # Having these endpoints publicly available is a security risk, so we disable them by default
+    path: /api-docs
+    enabled: false
+  swagger-ui:
+    path: api.html
+    operationsSorter: method
+    enabled: false
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+
+server:
+    servlet:
+        session:
+            cookie:
+                http-only: true
+    shutdown: graceful
+    forward-headers-strategy: native
+
+sentry:
+    logging:
+        enabled: true
+        minimum-breadcrumb-level: error
+        minimum-event-level: error
+    sample-rate: 1
+    traces-sample-rate: 0.2
+
+# Properties to be exposed on the /info management endpoint
+info:
+    sentry:
+        dsn: https://e52d0b9b6b61769f50b088634b4bc781@sentry.ase.in.tum.de/2 # Leave empty to disable Sentry, must be a valid URI
+    # Specifies whether text assessment analytics service (TextAssessmentEventResource) is enabled/disabled
+    # default value set to false
+    textAssessmentAnalyticsEnabled: false
+    studentExamStoreSessionData: true
+
+# ===================================================================
+# JHipster specific properties
+#
+# Full reference is available at: https://www.jhipster.tech/common-application-properties/
+# ===================================================================
+
+jhipster:
+    clientApp:
+        name: 'artemisApp'
+    # By default CORS is disabled. Uncomment to enable.
+    #cors:
+        #allowed-origin-patterns: "*"
+        #allowed-methods: "*"
+        #allowed-headers: "*"
+        #exposed-headers: "Authorization,Link,X-Total-Count"
+        #allow-credentials: true
+        #max-age: 1800
+    mail:
+        from: artemis@localhost
+    registry:
+        password: AN-ADMIN-PASSWORD-THAT-MUST-BE-CHANGED (FROM REGISTRY CONFIG)
+    http:
+        cache: # Used by the CachingHttpHeadersFilter
+            timeToLiveInDays: 1461
+    cache: # Cache configuration
+        hazelcast: # Hazelcast distributed cache
+            time-to-live-seconds: 3600
+            backup-count: 1
+
+# Eureka configuration
+eureka:
+    client:
+        enabled: false
+        service-url:
+            defaultZone: http://admin:${jhipster.registry.password}@localhost:8761/eureka/
+        healthcheck:
+            enabled: false
+        fetch-registry: true
+        register-with-eureka: true
+        instance-info-replication-interval-seconds: 10
+        registry-fetch-interval-seconds: 10
+    instance:
+        prefer-ip-address: true
+        appname: Artemis
+        instanceId: Artemis:1
+        lease-renewal-interval-in-seconds: 5
+        lease-expiration-duration-in-seconds: 10
+        status-page-url-path: ${management.endpoints.web.base-path}/info
+        health-check-url-path: ${management.endpoints.web.base-path}/health
+        metadata-map:
+            zone: primary # This is needed for the load balancer
+            profile: ${spring.profiles.active}
+            version: #project.version#
+            git-version: ${git.commit.id.describe:}
+            git-commit: ${git.commit.id.abbrev:}
+            git-branch: ${git.branch:}
+
+# Helios configuration
+# It is enabled and all the values are set by the ansible
+# Refer to the ansible repository https://github.com/ls1intum/artemis-ansible
+helios:
+  status:
+    enabled: false

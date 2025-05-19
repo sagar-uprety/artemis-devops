@@ -1,0 +1,20 @@
+@if (isInitialized) {
+    <div ngbAutofocus>
+        <div class="modal-header">
+            <h4 class="modal-title">
+                <span jhiTranslate="artemisApp.dialogs.createOneToOneChat.title"></span>
+            </h4>
+            <button type="button" class="btn-close dismiss" (click)="clear()"></button>
+        </div>
+        <div class="modal-body">
+            <jhi-course-users-selector
+                [ngModel]="selectedUsers"
+                (ngModelChange)="onSelectedUsersChange($event)"
+                [multiSelect]="false"
+                [showUserList]="false"
+                [courseId]="course.id!"
+                [label]="'artemisApp.dialogs.createOneToOneChat.userSelectorLabel' | artemisTranslate"
+            />
+        </div>
+    </div>
+}

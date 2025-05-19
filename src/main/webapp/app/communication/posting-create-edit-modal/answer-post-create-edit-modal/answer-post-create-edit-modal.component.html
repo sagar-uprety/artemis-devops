@@ -1,0 +1,18 @@
+<ng-template #postingEditor>
+    <form [formGroup]="formGroup" (ngSubmit)="confirm()">
+        <div class="me-2">
+            <jhi-posting-markdown-editor
+                formControlName="content"
+                [editorHeight]="editorHeight"
+                [maxContentLength]="maxContentLength"
+                [isInputLengthDisplayed]="false"
+                (keydown.enter)="confirm()"
+                [isButtonLoading]="isLoading"
+                [isFormGroupValid]="formGroup.valid"
+                [editType]="editType"
+                [showCloseButton]="true"
+                (closeEditor)="close()"
+            />
+        </div>
+    </form>
+</ng-template>

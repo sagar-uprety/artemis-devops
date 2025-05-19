@@ -1,0 +1,46 @@
+<div class="d-flex justify-content-between">
+    @if (isRepositoryView) {
+        <h3 jhiTranslate="artemisApp.programmingExercise.commitInfo.history"></h3>
+    } @else {
+        <h5 jhiTranslate="artemisApp.programmingExercise.commitInfo.title"></h5>
+    }
+    <button class="btn btn-secondary me-2" (click)="toggleAllExpanded()">
+        @if (isGroupsExpanded) {
+            <span jhiTranslate="artemisApp.programmingExercise.configureGrading.collapseAll"></span>
+        } @else {
+            <span jhiTranslate="artemisApp.programmingExercise.configureGrading.expandAll"></span>
+        }
+    </button>
+</div>
+
+<div style="overflow-x: auto">
+    <table class="table table-responsive">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col" jhiTranslate="artemisApp.programmingExercise.commitInfo.commitHash"></th>
+                <th scope="col" jhiTranslate="artemisApp.programmingExercise.commitInfo.author"></th>
+                <th scope="col" jhiTranslate="artemisApp.programmingExercise.commitInfo.date"></th>
+                <th scope="col" jhiTranslate="artemisApp.programmingExercise.commitInfo.result"></th>
+                <th scope="col" jhiTranslate="artemisApp.programmingExercise.commitInfo.message"></th>
+                <th scope="col" jhiTranslate="artemisApp.programmingExercise.commitInfo.commits"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (commitGroup of groupedCommits; track commitGroup; let i = $index) {
+                <jhi-commits-info-group
+                    [ngStyle]="{ display: 'contents' }"
+                    [commits]="commitGroup.commits"
+                    [currentSubmissionHash]="currentSubmissionHash"
+                    [previousSubmissionHash]="previousSubmissionHash"
+                    [exerciseProjectKey]="exerciseProjectKey"
+                    [isRepositoryView]="isRepositoryView"
+                    [groupCount]="groupedCommits.length"
+                    [groupIndex]="i"
+                    [pushNumber]="i + 1"
+                    [isGroupExpanded]="isGroupsExpanded"
+                />
+            }
+        </tbody>
+    </table>
+</div>

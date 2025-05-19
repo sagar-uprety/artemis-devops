@@ -1,0 +1,48 @@
+$draggable-width: 15px;
+
+.modeling-assessment {
+    position: relative;
+    display: flex;
+    flex-flow: column nowrap;
+    height: 100%;
+
+    .card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        font-size: 1rem;
+        font-weight: 500;
+    }
+}
+
+.resizable {
+    display: flex;
+
+    .draggable-right,
+    .draggable-bottom {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: $draggable-width;
+    }
+}
+
+.apollon-container {
+    height: 100%;
+    width: 100%;
+}
+
+.apollon-row {
+    display: flex;
+    height: 100%;
+}
+
+/* Target the modeling-assessment class for print media */
+@media print {
+    .modeling-assessment {
+        /* Adjust the size of the container to fit the print area */
+        height: auto !important;
+        max-height: 100vh !important;
+    }
+}

@@ -1,0 +1,11 @@
+<input
+    placeholder="{{ 'artemisApp.exercise.notificationText' | artemisTranslate }}"
+    title="{{ 'artemisApp.exercise.notificationText' | artemisTranslate }}"
+    minlength="3"
+    type="text"
+    class="form-control form-control-sm"
+    name="notificationText"
+    id="field_notification_text"
+    (change)="onInputChanged()"
+    [(ngModel)]="notificationText"
+/>

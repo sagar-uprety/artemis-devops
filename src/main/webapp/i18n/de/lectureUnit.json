@@ -1,0 +1,186 @@
+{
+    "artemisApp": {
+        "lectureUnit": {
+            "deleted": "Vorlesungseinheit gelöscht",
+            "home": {
+                "title": "Vorlesungseinheiten"
+            },
+            "unitCreationCard": {
+                "title": "Hinzufügen einer neuen Vorlesungseinheit",
+                "text": "Text",
+                "exercise": "Übung",
+                "video": "Video",
+                "online": "Online",
+                "attachmentVideo": "Datei/Video"
+            },
+            "releaseDate": "Veröffentlichungsdatum",
+            "details": {
+                "title": "Eigenschaften",
+                "releaseDateNotSet": "Kein Veröffentlichungsdatum gesetzt!",
+                "releaseDateSet": "Veröffentlichungsdatum: ",
+                "attachmentVersion": "Dateiversion: "
+            },
+            "completedTooltip": "Klicke hier, um die Vorlesungseinheit als unerledigt zu markieren",
+            "uncompletedTooltip": "Klicke hier, um die Vorlesungseinheit als erledigt zu markieren"
+        },
+        "textUnit": {
+            "created": "Eine neue Texteinheit erstellt",
+            "updated": "Texteinheit aktualisiert",
+            "tooltip": "Das ist eine Texteinheit",
+            "isolated": "Isoliert öffnen",
+            "originalVersion": "Originalversion",
+            "notReleasedTooltip": "Text nur sichtbar für Tutor:innen und Lehrende. Veröffentlichungsdatum:",
+            "markdownHelp": "Hier kann Markdown eingegeben werden. Mehr Informationen:",
+            "cachedMarkdown": "Artemis hat ungespeichertes Markdown im local storage gefunden. Möchtest du es laden? Speicherdatum:",
+            "createTextUnit": {
+                "title": "Erstelle Texteinheit",
+                "name": "Name",
+                "content": "Inhalt",
+                "namePlaceHolder": "Gib der Texteinheit einen Namen",
+                "nameRequiredValidationError": "Der Name ist ein Pflichtfeld.",
+                "nameMaxLengthValidationError": "Der Name kann maximal 255 Zeichen lang sein."
+            },
+            "editTextUnit": {
+                "title": "Bearbeite Texteinheit"
+            },
+            "delete": {
+                "question": "Willst du wirklich die Texteinheit <strong>{{ title }}</strong> löschen? Du kannst diese Aktion nicht rückgängig machen!",
+                "typeNameToConfirm": "Bitte gib den Namen der Texteinheit zur Bestätigung ein.",
+                "buttonText": "Löschen"
+            }
+        },
+        "onlineUnit": {
+            "created": "Eine neue Onlineeinheit wurde erstellt",
+            "updated": "Onlineeinheit aktualisiert",
+            "tooltip": "Das ist eine Onlineeinheit",
+            "description": "Beschreibung",
+            "notReleasedTooltip": "Onlineeinheit nur sichtbar für Tutor:innen und Lehrende. Veröffentlichungsdatum:",
+            "doOpen": "Link öffnen",
+            "createOnlineUnit": {
+                "title": "Erstelle Onlineeinheit",
+                "name": "Name",
+                "namePlaceHolder": "Gib der Onlineeinheit einen Namen",
+                "description": "Beschreibung",
+                "descriptionPlaceHolder": "Gib der Onlineeinheit eine Beschreibung",
+                "nameRequiredValidationError": "Der Name ist ein Pflichtfeld.",
+                "nameMaxLengthValidationError": "Der Name kann maximal 255 Zeichen lang sein.",
+                "descriptionMaxLengthValidationError": "Die Beschreibung kann maximal 1000 Zeichen lang sein.",
+                "source": "Externes Onlineangebot URL",
+                "sourcePlaceHolder": "Gib eine URL zu einem externen Onlineangebot ein.",
+                "sourceRequiredValidationError": "Link ist ein Pflichtfeld",
+                "sourceURLValidationError": "Keine valide URL",
+                "urlHelperPlaceholder": "Name und Beschreibung werden von den Metadaten des Links geladen"
+            },
+            "editOnlineUnit": {
+                "title": "Bearbeite eine Onlineeinheit"
+            },
+            "delete": {
+                "question": "Willst du wirklich die Onlineeinheit <strong>{{ title }}</strong> löschen? Du kannst diese Aktion nicht rückgängig machen!",
+                "typeNameToConfirm": "Bitte gib den Namen der Onlineeinheit zur Bestätigung ein.",
+                "buttonText": "Löschen"
+            }
+        },
+        "attachmentVideoUnit": {
+            "created": "Eine neue Dateieinheit wurde erstellt",
+            "updated": "Dateieinheit aktualisiert",
+            "notReleasedTooltip": "Nur sichtbar für Tutor:innen und Lehrende. Veröffentlichungsdatum:",
+            "createAttachmentVideoUnits": {
+                "informativeText": {
+                    "firstLine": "Artemis sucht nach der Gliederung (Folie mit Titel 'Outline' und Stichpunkten mit Kapitelüberschriften) und unterteilt das PDF in Einheiten.",
+                    "secondLine": "Artemis erwartet eine Wiederholung der Gliederungsfolie vor jeder Einheit.",
+                    "note": "Hinweis: Du kannst die Informationen bearbeiten, bevor die angehängten Einheiten übermittelt werden."
+                },
+                "noFile": "Es gibt keine Datei für die automatische Einheitenverarbeitung. Bitte gehe einen Schritt zurück und versuche es erneut.",
+                "noUnitDetected": "Es wurde keine Einheit erkannt und konnte nicht automatisch geteilt werden. Bitte füge Informationen für jede Einheit hinzu!",
+                "pageTitle": "Einheiten",
+                "addUnit": "Einheit hinzufügen",
+                "processUnits": "Einheiten festlegen",
+                "processAutomatically": "Automatische Einheitenverarbeitung",
+                "removeSlides": "Entferne Folien",
+                "removeSlidesInfo": {
+                    "firstLine": "Alle Folien, die einen der folgenden Schlüsselsätze enthalten, werden entfernt.",
+                    "secondLine": "Mehrere Schlüsselsätze werden mit einem Komma getrennt, zwischen Groß- und Kleinbuchstaben wird nicht unterschieden.",
+                    "thirdLine": "Folgende Folien werden entfernt:"
+                },
+                "timeout": "Zeitüberschreitung während der automatischen Einheitenverarbeitung. Bitte versuche es erneut.",
+                "removeSlidesPlaceholder": "Beispiel: 'Pause, Beispiellösungen'",
+                "validation": {
+                    "invalidPages": "Die Startseite oder die letzte Seite von {{ unitName }} sind falsch eingestellt.",
+                    "empty": {
+                        "unitName": "Name darf nicht leer sein.",
+                        "startPage": "Die Startseite muss definiert sein.",
+                        "endPage": "Die letzte Seite muss definiert sein."
+                    },
+                    "endPageLower": "Letzte Seite darf nicht kleiner als 1 sein.",
+                    "startPageBigger": "Die Startseite darf nicht größer als {{ max }} sein.",
+                    "startPage": "Startseite muss größer oder gleich 1 sein.",
+                    "endPage": "Letzte Seite darf nicht größer als {{ max }} sein."
+                },
+                "split": {
+                    "empty": "",
+                    "unit": "Vortragseinheiten",
+                    "unitName": "Einheitenname",
+                    "releaseDate": "Veröffentlichungsdatum",
+                    "startPage": "Startseite",
+                    "endPage": "Letzte Seite"
+                },
+                "lectureFileToolTip": "Bitte auswählen, um die automatische Trennung von Vorlesungseinheiten zu aktivieren.",
+                "processTimeInfo": "Die Verarbeitung der Vortragseinheiten kann einige Sekunden dauern. Habe bitte etwas Geduld."
+            },
+            "createAttachmentVideoUnit": {
+                "title": "Dateieinheit erstellen",
+                "name": "Name",
+                "namePlaceHolder": "Gib der Einheit einen Namen",
+                "description": "Beschreibung",
+                "updateNotificationText": "Update Benachrichtigungstext",
+                "updateNotificationTextPlaceholder": "Optionaler Benachrichtigungstext für Studierende über Änderungen.",
+                "updateNotificationTextMaxLengthValidationError": "Der Benachrichtigungstext kann maximal 1000 Zeichen lang sein.",
+                "descriptionPlaceHolder": "Gib der Einheit eine Beschreibung",
+                "nameRequiredValidationError": "Der Name ist ein Pflichtfeld.",
+                "nameMaxLengthValidationError": "Der Name kann maximal 255 Zeichen lang sein.",
+                "descriptionMaxLengthValidationError": "Die Beschreibung kann maximal 1000 Zeichen lang sein.",
+                "file": "Datei",
+                "version": "Version",
+                "fileRequiredValidationError": "Du musst eine Datei zum Uploaden auswählen.",
+                "chooseFile": "Datei auswählen",
+                "fileTooBig": "Die Datei ist zu groß! Die maximale Dateigröße beträgt 20 MB.",
+                "fileLimitation": "(max. Größe 20 MB)",
+                "fileLimitationTooltip": "Unterstützte Formate: {{ extensions }}",
+                "source": "Einbettbares Video URL",
+                "sourcePlaceHolder": "Gib eine URL zu einem einbettbarem Video ein.",
+                "sourceRequiredValidationError": "Video URL ist ein Pflichtfeld",
+                "sourceURLValidationError": "Keine valide URL",
+                "urlVideoHelper": "Umwandlung in einbettbares Format ",
+                "urlHelperPlaceholder": "Du kannst hier eine Video-URL eingeben und den Pfeil benutzen, um sie in die korrekte einbettbare URL umzuwandeln",
+                "urlHelperValidationError": "Automatische Formatumwandlung ist nicht möglich für diese URL"
+            },
+            "editAttachmentVideoUnit": {
+                "title": "Bearbeite Dateieinheit"
+            },
+            "tooltip": "Das ist eine Datei",
+            "uploadDate": "Upload Datum",
+            "version": "Version",
+            "FileName": "Dateiname",
+            "description": "Beschreibung",
+            "download": "Datei herunterladen",
+            "delete": {
+                "question": "Willst du wirklich die Dateieinheit <strong>{{ title }}</strong> löschen? Die Datei wird auch gelöscht! Du kannst diese Aktion nicht rückgängig machen!",
+                "typeNameToConfirm": "Bitte gib den Namen der Dateieinheit zur Bestätigung ein.",
+                "buttonText": "Löschen"
+            }
+        },
+        "exerciseUnit": {
+            "created": "Übung mit Vorlesung verbunden",
+            "createExerciseUnit": {
+                "title": "Übungseinheit",
+                "headline": "Verbindung eine Übung mit der Vorlesung",
+                "description": "Wähle alle Übungen zur Verbindung mit der Vorlesung aus."
+            },
+            "delete": {
+                "question": "Willst du wirklich die Verknüpfung mit der Übung <strong>{{ title }}</strong> entfernen? Die Übung bleibt erhalten! Du kannst diese Aktion nicht rückgängig machen!",
+                "typeNameToConfirm": "Bitte gib den Namen der Übung zur Bestätigung ein.",
+                "buttonText": "Trennen"
+            }
+        }
+    }
+}

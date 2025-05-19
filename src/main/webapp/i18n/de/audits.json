@@ -1,0 +1,28 @@
+{
+    "audits": {
+        "title": "Audits",
+        "notFound": "Kein Audit gefunden",
+        "filter": {
+            "title": "Nach Datum filtern",
+            "from": "von",
+            "to": "bis",
+            "button": {
+                "weeks": "Wochen",
+                "today": "heute",
+                "clear": "leeren",
+                "close": "abschließen"
+            }
+        },
+        "table": {
+            "header": {
+                "principal": "Nutzer:in",
+                "date": "Datum",
+                "status": "Stand",
+                "data": "Extra Informationen"
+            },
+            "data": {
+                "remoteAddress": "Remote-Adresse:"
+            }
+        }
+    }
+}

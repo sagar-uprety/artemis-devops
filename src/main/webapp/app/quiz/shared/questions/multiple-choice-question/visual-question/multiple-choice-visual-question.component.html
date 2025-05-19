@@ -1,0 +1,83 @@
+<div class="markdown-preview visual-mode">
+    <h4 jhiTranslate="artemisApp.multipleChoiceQuestion.visualEditor.questionTitle"></h4>
+    <textarea
+        id="mc-question"
+        class="form-control form-group-narrow"
+        [(ngModel)]="this.question.text"
+        rows="5"
+        (input)="this.questionChanged.emit()"
+        placeholder="{{ 'artemisApp.multipleChoiceQuestion.visualEditor.textPlaceholder' | artemisTranslate }}"
+    ></textarea>
+    <div class="form-group-narrow visual-question-hint">
+        <fa-icon [icon]="faQuestionCircle" class="text-secondary me-1" ngbTooltip="{{ 'artemisApp.multipleChoiceQuestion.visualEditor.hintTooltip' | artemisTranslate }}" />
+        <input
+            class="form-control"
+            [(ngModel)]="question.hint"
+            (input)="this.questionChanged.emit()"
+            placeholder="{{ 'artemisApp.multipleChoiceQuestion.visualEditor.hintPlaceholder' | artemisTranslate }}"
+        />
+    </div>
+    <div class="form-group visual-question-hint">
+        <fa-icon
+            [icon]="faExclamationCircle"
+            class="text-secondary me-1"
+            ngbTooltip="{{ 'artemisApp.multipleChoiceQuestion.visualEditor.explanationTooltip' | artemisTranslate }}"
+        />
+        <input
+            class="form-control"
+            [(ngModel)]="question.explanation"
+            (input)="this.questionChanged.emit()"
+            placeholder="{{ 'artemisApp.multipleChoiceQuestion.visualEditor.explanationPlaceholder' | artemisTranslate }}"
+        />
+    </div>
+    <h4 jhiTranslate="artemisApp.multipleChoiceQuestion.visualEditor.answersTitle"></h4>
+    @for (answerOption of question.answerOptions; track answerOption; let i = $index) {
+        <div id="answer-option-{{ i }}" class="visual-answer-option form-group-narrow">
+            <div class="form-group-narrow visual-answer-question-container">
+                <div
+                    class="visual-answer"
+                    [ngClass]="answerOption.isCorrect ? 'visual-answer-correct-container' : 'visual-answer-wrong-container'"
+                    (click)="toggleIsCorrect(answerOption)"
+                >
+                    <fa-icon [icon]="answerOption.isCorrect ? faCheck : faXmark" />
+                </div>
+                <input
+                    id="answer-option-{{ i }}-text"
+                    class="form-control"
+                    [(ngModel)]="answerOption.text"
+                    (input)="this.questionChanged.emit()"
+                    placeholder="{{ 'artemisApp.multipleChoiceQuestion.visualEditor.textPlaceholder' | artemisTranslate }}"
+                />
+                <div id="answer-option-{{ i }}-delete" class="visual-answer-delete-container" (click)="deleteAnswer(i)">
+                    <fa-icon [icon]="faTrash" />
+                </div>
+            </div>
+            <div class="form-group-narrow visual-question-hint">
+                <fa-icon [icon]="faQuestionCircle" class="text-secondary me-1" ngbTooltip="{{ 'artemisApp.multipleChoiceQuestion.visualEditor.hintTooltip' | artemisTranslate }}" />
+                <input
+                    class="form-control"
+                    [(ngModel)]="answerOption.hint"
+                    (input)="this.questionChanged.emit()"
+                    placeholder="{{ 'artemisApp.multipleChoiceQuestion.visualEditor.hintPlaceholder' | artemisTranslate }}"
+                />
+            </div>
+            <div class="visual-question-hint">
+                <fa-icon
+                    [icon]="faExclamationCircle"
+                    class="text-secondary me-1"
+                    ngbTooltip="{{ 'artemisApp.multipleChoiceQuestion.visualEditor.explanationTooltip' | artemisTranslate }}"
+                />
+                <input
+                    class="form-control"
+                    [(ngModel)]="answerOption.explanation"
+                    (input)="this.questionChanged.emit()"
+                    placeholder="{{ 'artemisApp.multipleChoiceQuestion.visualEditor.explanationPlaceholder' | artemisTranslate }}"
+                />
+            </div>
+        </div>
+    }
+    <button id="add-mc-answer-option" class="btn btn-block btn-success mt-2" (click)="addNewAnswer()">
+        <fa-icon [icon]="faPlus" />
+        <span jhiTranslate="artemisApp.multipleChoiceQuestion.visualEditor.newAnswerTitle"></span>
+    </button>
+</div>

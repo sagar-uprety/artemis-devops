@@ -1,0 +1,140 @@
+{
+    "artemisApp": {
+        "lecture": {
+            "home": {
+                "title": "Vorlesungen",
+                "createLabel": "Vorlesung erstellen",
+                "editLabel": "Vorlesung bearbeiten",
+                "filterLabel": "Filter",
+                "filterOptions": {
+                    "filterPast": "Vergangene",
+                    "filterCurrent": "Aktuelle",
+                    "filterFuture": "Zukünftige",
+                    "filterUnspecifiedDates": "Ohne Zeitangaben"
+                },
+                "createOrEditLabel": "Vorlesung erstellen oder bearbeiten",
+                "ingestLecturesInPyrisLabel": "Vorlesungen an Iris senden"
+            },
+            "created": "Vorlesung erstellt mit ID {{ param }}",
+            "updated": "Vorlesung aktualisiert mit ID {{ param }}",
+            "deleted": "Vorlesung gelöscht mit ID {{ param }}",
+            "delete": {
+                "question": "Soll die Vorlesung <strong>{{ title }}</strong> wirklich dauerhaft gelöscht werden? Diese Aktion kann NICHT rückgängig gemacht werden!",
+                "typeNameToConfirm": "Bitte gib den Namen der Vorlesung zur Bestätigung ein."
+            },
+            "title": "Titel",
+            "channelName": "Kanalname",
+            "description": "Beschreibung",
+            "startDate": "Start",
+            "endDate": "Ende",
+            "visibleDate": "Sichtbar ab",
+            "course": "Kurs",
+            "ingestionState": "Iris-Verarbeitungsstatus",
+            "detail": {
+                "title": "Vorlesung",
+                "sections": {
+                    "general": "Informationen"
+                }
+            },
+            "attachments": {
+                "title": "Anhänge der Vorlesung",
+                "name": "Name",
+                "type": "Typ",
+                "link": "Link",
+                "file": "Datei",
+                "releaseDate": "Freigabedatum",
+                "uploadDate": "Upload-Datum",
+                "version": "Version",
+                "uploading": "Lade hoch...",
+                "isBeingEdited": "Wird gerade bearbeitet...",
+                "isDownloading": "Wird heruntergeladen...",
+                "attachments": "Anhänge",
+                "newAttachment": "Neuer Anhang",
+                "editAttachment": "Anhang bearbeiten",
+                "notificationText": "Mitteilungstext",
+                "notificationPlaceholder": "Was wurde geändert?",
+                "chooseFile": "Datei auswählen",
+                "error": "Die Datei {{ fileName }} ist zu groß. Die maximale Dateigröße beträgt 20 MB.",
+                "fileLimitation": "(max. Größe 20 MB)",
+                "fileLimitationTooltip": "Unterstützte Formate: {{ extensions }}"
+            },
+            "import": {
+                "table": {
+                    "TITLE": "Titel",
+                    "COURSE_TITLE": "Kurs",
+                    "SEMESTER": "Semester",
+                    "doImport": "Importieren"
+                },
+                "search": "Nach Vorlesung suchen:",
+                "loading": "Lade...",
+                "label": "Vorlesung importieren"
+            },
+            "sections": {
+                "title": "Titel",
+                "titleDescription": "Gib einen Titel und eine aussagekräftige Beschreibung für die Vorlesung ein.",
+                "period": "Zeitraum",
+                "periodDescription": "Lege das Start- und Enddatum der Vorlesung fest.",
+                "attachments": "Anhänge",
+                "attachmentsDescription": "Lade Anhänge für die Vorlesung hoch.",
+                "units": "Vorlesungseinheiten",
+                "unitsDescription": "Füge Inhalte zur Vorlesung hinzu, indem du Vorlesungseinheiten erstellst."
+            },
+            "newLectureUnit": "Neue Vorlesungseinheit",
+            "editLectureUnit": "Vorlesungseinheit bearbeiten",
+            "dismissChangesModal": {
+                "title": "Ungespeicherte Änderungen der Vorlesung verwerfen?",
+                "message": "Bist du sicher, dass du die ungespeicherten Änderungen verwerfen willst?",
+                "sectionsThatContainUnsavedChangesSingular": "Der folgende Abschnitt enthält ungespeicherte Änderungen:",
+                "sectionsThatContainUnsavedChangesPlural": "Die folgenden Abschnitte enthalten ungespeicherte Änderungen:"
+            }
+        },
+        "attachment": {
+            "deleteQuestion": "Soll der Anhang wirklich gelöscht werden?",
+            "created": "Anhang erstellt mit ID {{ param }}",
+            "updated": "Anhang aktualisiert mit ID {{ param }}",
+            "deleted": "Anhang gelöscht mit ID {{ param }}",
+            "pdfPreview": {
+                "title": "Anhang",
+                "attachmentIDError": "Ungültiger Anhang oder ungültige Anhangs-ID.",
+                "attachmentVideoUnitIDError": "Ungültige Dateieinheit oder ungültige Dateieinheits-ID.",
+                "noPDFAvailable": "Kein PDF verfügbar",
+                "cancelButton": "Abbrechen",
+                "removePageButton": "Seiten entfernen",
+                "hidePageButton": "Seiten ausblenden",
+                "showPageButton": "Seiten anzeigen",
+                "showPagesTitle": "Seiten anzeigen",
+                "appendPDFButton": "PDF anhängen",
+                "attachmentUpdateSuccess": "Anhang erfolgreich aktualisiert.",
+                "attachmentUpdateError": "Fehler beim Aktualisieren des Anhangs: {{error}}",
+                "mergeFailedError": "Fehler beim Zusammenführen der Dateien: {{error}}",
+                "pageDeleteError": "Fehler beim Löschen der Seiten: {{error}}",
+                "fileSizeError": "Die Datei ist zu groß. Die maximale Dateigröße beträgt 20MB.",
+                "deletePagesQuestion": "Möchtest du die ausgewählten Seiten wirklich löschen?",
+                "deleteAllPagesQuestion": "Möchtest du wirklich alle Seiten löschen? Dies führt zur Löschung des Anhangs.",
+                "confirmCancelEditing": "Abbruchvorgang bestätigen",
+                "cancelEditingQuestion": "Möchtest du wirklich gehen, ohne deine Änderungen zu speichern?",
+                "invalidFileType": "Du kannst nur PDF-Dateien hochladen.",
+                "studentVersionCreateError": "Die Studierenden-Version der Datei konnte nicht erstellt werden.",
+                "studentVersionUpdateError": "Die Studierenden-Version der Datei konnte nicht aktualisiert werden..",
+                "thumbnailGrid": {
+                    "showPage": "Seite {{ param }} anzeigen",
+                    "hiddenUntil": "Diese Seite ist ausgeblendet bis:",
+                    "showPageConfirmation": "Möchtest du diese Seite anzeigen?",
+                    "forever": "IMMER",
+                    "exerciseId": "(Aufgabe Id: {{ param }})"
+                },
+                "dateBox": {
+                    "hidePage": "Seite {{ param }} ausblenden",
+                    "hideMultiplePages": "Seiten {{ param }} ausblenden",
+                    "hideForever": "Für immer ausblenden",
+                    "selectDate": "Datum auswählen",
+                    "selectExercise": "Aufgabe auswählen",
+                    "noExercises": "Keine Aufgaben verfügbar",
+                    "exerciseTypeTitle": "{{ param }} Aufgaben",
+                    "dateError": "Die ausgewählten Daten dürfen nicht in der Vergangenheit liegen.",
+                    "dateErrorWithPages": "Die ausgewählten Daten dürfen nicht in der Vergangenheit liegen. Ungültige Seiten: {{ param }}"
+                }
+            }
+        }
+    }
+}

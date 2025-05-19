@@ -1,0 +1,16 @@
+@if (participationType === ProgrammingExerciseParticipationType.TEMPLATE && latestResult && latestResult.score! > 0) {
+    <fa-icon
+        id="instructor-status-template"
+        [icon]="faExclamationTriangle"
+        class="text-warning"
+        [ngbTooltip]="'artemisApp.programmingExercise.status.templateFulfillsTest' | artemisTranslate"
+    />
+}
+@if (participationType === ProgrammingExerciseParticipationType.SOLUTION && latestResult && !latestResult.successful) {
+    <fa-icon
+        id="instructor-status-solution"
+        [icon]="faExclamationTriangle"
+        class="text-warning"
+        [ngbTooltip]="'artemisApp.programmingExercise.status.solutionFailsTest' | artemisTranslate"
+    />
+}

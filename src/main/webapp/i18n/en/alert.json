@@ -1,0 +1,10 @@
+{
+    "artemisApp": {
+        "disconnectedAlert": "You are not connected to the Artemis Server. Please check your internet connection.",
+        "outdatedAlert": "<b>Your Artemis version is outdated.</b> Please update to the latest version.",
+        "outdatedAction": "Update",
+        "alerts": {
+            "dismissAll": "Dismiss all"
+        }
+    }
+}

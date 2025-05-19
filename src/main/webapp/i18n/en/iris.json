@@ -1,0 +1,159 @@
+{
+    "artemisApp": {
+        "iris": {
+            "settings": {
+                "success": "Successfully saved Iris settings",
+                "error": {
+                    "save": "Error while saving Iris settings",
+                    "noSettings": "Unable to load settings. Please contact your administrator if this problem persists."
+                },
+                "button": {
+                    "reload": "Reload Settings",
+                    "save": "Save Settings",
+                    "textExercise": {
+                        "title": "Iris",
+                        "tooltip": "Edit the Iris settings for this text exercise"
+                    },
+                    "programmingExercise": {
+                        "title": "Iris",
+                        "tooltip": "Edit the Iris settings for this programming exercise"
+                    },
+                    "lecture": {
+                        "title": "Iris",
+                        "tooltip": "Edit the Iris settings for this lecture"
+                    },
+                    "course": {
+                        "title": "Iris",
+                        "tooltip": "Edit the Iris settings for this course"
+                    }
+                },
+                "subSettings": {
+                    "exerciseChatSettings": "Programming Exercise Chat Settings",
+                    "textExerciseChatSettings": "Text Exercise Chat Settings",
+                    "lectureChatSettings": "Lecture Chat Settings",
+                    "courseChatSettings": "Course Chat Settings",
+                    "lectureIngestionSettings": {
+                        "title": "Lecture Processing Settings",
+                        "autoIngestOnAttachmentUpload": "Automatically Send Lectures"
+                    },
+                    "faqIngestionSettings": {
+                        "title": "FAQ Processing Settings",
+                        "autoIngest": "Send FAQs To Iris Automatically"
+                    },
+                    "competencyGenerationSettings": "Competency Generation Settings",
+                    "tutorSuggestionSettings": "Tutor Suggestion Settings",
+                    "proactivityBuildFailedEventEnabled": {
+                        "label": "Monitor submission build failures",
+                        "tooltip": "When enabled, Iris will proactively send help messages if a submission build fails."
+                    },
+                    "proactivityProgressStalledEventEnabled": {
+                        "label": "Monitor exercise performance progress",
+                        "tooltip": "When enabled, Iris will proactively send help messages if the student's exercise performance does not improve."
+                    },
+                    "proactivitySettings": {
+                        "title": "Proactivity Settings",
+                        "tooltip": "Enable options below to allow Iris to proactively reach out to students when specific conditions are met.",
+                        "parentDisabled": "Iris won't send proactive messages for this option because either the option itself or Iris are disabled in the current or parent settings."
+                    },
+                    "enabled-disabled": "Enabled/Disabled",
+                    "enabledForCategories": "Automatically enable for categories",
+                    "variants": {
+                        "title": "Variants",
+                        "allowedVariants": {
+                            "title": "Allowed Variants",
+                            "inheritSwitch": "Inherit Allowed Variants"
+                        },
+                        "selectedVariant": {
+                            "title": "Selected Variant",
+                            "inherit": "Inherit"
+                        }
+                    },
+                    "rateLimit": "Rate Limit",
+                    "rateLimitTooltip": "The maximum number of answers a user can receive from the LLM in a given time period.",
+                    "rateLimitTimeframeHours": "Rate Limit Timeframe (Hours)",
+                    "rateLimitTimeframeHoursTooltip": "The time period in which the rate limit applies in hours.",
+                    "template": {
+                        "title": "Template",
+                        "inherit": "Inherit Template"
+                    },
+                    "enabled": {
+                        "on": "Enabled",
+                        "off": "Disabled",
+                        "custom": "Custom",
+                        "chat": "Iris Chat"
+                    },
+                    "disabled": {
+                        "course": "IRIS is disabled in course IRIS settings",
+                        "global": "IRIS is disabled in global IRIS settings"
+                    },
+                    "customInstructions": {
+                        "title": "Custom Instructions",
+                        "description": "Custom instructions to be provided to the AI when generating responses.",
+                        "placeholder": "Enter custom instructions for the AI (max 2048 characters)"
+                    }
+                },
+                "title": {
+                    "breadcrumb": "Iris Settings",
+                    "global": "Global Iris Settings",
+                    "course": "Course Iris Settings",
+                    "exercise": "Exercise Iris Settings"
+                }
+            },
+            "error": {
+                "forbidden": "Artemis is not configured to use Iris. (Invalid token)",
+                "internalPyrisError": "An internal error when communicating with the LLM occurred. Error message is: {{ pyrisErrorMessage }}.",
+                "invalidTemplate": "The template is invalid. Error message is: {{ pyrisErrorMessage }}.",
+                "noVariantAvailable": "Variant {{ variant }} is not available to use. Please contact your administrator if this problem persists.",
+                "noResponse": "No response from Iris was received.",
+                "parseResponse": "An error occurred while parsing the response from Iris. Cause: {{ cause }}"
+            },
+            "chat": {
+                "helpOffer": "How can I help you today?"
+            },
+            "tutorSuggestion": {
+                "loading": "Loading suggestions...",
+                "noIris": "Iris is currently unavailable."
+            },
+            "chatBubble": {
+                "seeFull": "See full message"
+            },
+            "ingestionStates": {
+                "loading": "Loading",
+                "notStarted": "Not started",
+                "inProgress": "In progress",
+                "done": "Done",
+                "error": "Error",
+                "partiallyIngested": "Partially processed"
+            },
+            "ingestionAlert": {
+                "lectureUnitSuccess": "Lecture unit processing in Iris has started",
+                "lectureUnitError": "Error while sending lecture unit to Iris",
+                "lectureSuccess": "Lecture processing in Iris has started",
+                "lectureError": "Error while sending lecture to Iris",
+                "allLecturesSuccess": "All Lectures are now being processed",
+                "allFaqsSuccess": "All Faq processing in Iris started successfully",
+                "allLecturesError": "Error while sending all lectures to Iris",
+                "allFaqsError": "Error while sending all Faqs to Iris",
+                "lectureNotFound": "Could not send lecture to Iris, no lecture found with the provided id.",
+                "pyrisUnavailable": "Iris is currently unavailable.",
+                "pyrisError": "An error occurred while getting processing status from Iris.",
+                "transcriptionIngestionError": "Error while sending transcription"
+            },
+            "controlCenter": {
+                "tooltip": "By toggling you enable or disable ALL Iris features for this course. For a more precise control, please use the Iris settings by clicking on Custom."
+            },
+            "chatHistory": {
+                "title": "Chats",
+                "today": "Today",
+                "yesterday": "Yesterday",
+                "last7Days": "Last 7 Days",
+                "last30Days": "Last 30 Days",
+                "older": "Older",
+                "relatedEntityTooltip": {
+                    "programmingExercise": "This chat is related to a programming exercise.",
+                    "lecture": "This chat is related to a lecture."
+                }
+            }
+        }
+    }
+}

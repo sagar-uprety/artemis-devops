@@ -1,0 +1,118 @@
+<jhi-assessment-layout
+    (navigateBack)="navigateBack()"
+    [isLoading]="isLoading"
+    [saveBusy]="saveBusy"
+    [submitBusy]="submitBusy"
+    [cancelBusy]="cancelBusy"
+    [nextSubmissionBusy]="nextSubmissionBusy"
+    [isTeamMode]="!!exercise?.teamMode"
+    [isAssessor]="isAssessor"
+    [canOverride]="canOverride"
+    [result]="result"
+    [assessmentsAreValid]="assessmentsAreValid"
+    [complaint]="complaint"
+    [exercise]="exercise"
+    [submission]="submission"
+    [isTestRun]="isTestRun"
+    [exerciseDashboardLink]="exerciseDashboardLink"
+    [hasAssessmentDueDatePassed]="hasAssessmentDueDatePassed"
+    [correctionRound]="correctionRound"
+    (save)="save()"
+    (onSubmit)="submit()"
+    (onCancel)="cancel()"
+    (nextSubmission)="nextSubmission()"
+    [(highlightDifferences)]="highlightDifferences"
+    (updateAssessmentAfterComplaint)="updateAssessmentAfterComplaint($event)"
+    (useAsExampleSubmission)="useStudentSubmissionAsExampleSubmission()"
+>
+    @if (submission) {
+        <div class="row">
+            <jhi-resizeable-container class="col-12">
+                <!--region Left Panel-->
+                <jhi-score-display left-header [maxPoints]="exercise?.maxPoints || 0" [maxBonusPoints]="exercise?.bonusPoints || 0" [score]="totalScore" [course]="course" />
+                <jhi-text-assessment-area
+                    left-body
+                    [submission]="submission!"
+                    [(textBlockRefs)]="textBlockRefs"
+                    [readOnly]="readOnly"
+                    [highlightDifferences]="highlightDifferences"
+                    (textBlockRefsChange)="validateFeedback()"
+                    (textBlockRefsAddedRemoved)="recalculateTextBlockRefs()"
+                    [criteria]="exercise!.gradingCriteria"
+                />
+                <!--endregion-->
+                <!--region Right Panel-->
+                <fa-icon right-header [icon]="farListAlt" />&nbsp;
+                <span right-header jhiTranslate="artemisApp.textAssessment.instructions"></span>
+                <div right-body class="alert alert-info text-center mb-4" role="alert" jhiTranslate="artemisApp.textAssessment.assessmentInstruction"></div>
+                <jhi-assessment-instructions id="instructions-card" right-body [exercise]="exercise!" class="markdown-preview" />
+                <!--endregion-->
+            </jhi-resizeable-container>
+        </div>
+        <div class="row mt-3">
+            @if (result && result.id) {
+                <jhi-unreferenced-feedback
+                    [(feedbacks)]="unreferencedFeedback"
+                    [highlightDifferences]="highlightDifferences"
+                    (feedbacksChange)="validateFeedback()"
+                    [readOnly]="readOnly"
+                    [useDefaultFeedbackSuggestionBadgeText]="true"
+                    [resultId]="result.id"
+                />
+            }
+        </div>
+    } @else {
+        @if (!loadingInitialSubmission) {
+            <div>
+                @if (noNewSubmissions) {
+                    <div class="alert alert-warning text-center mt-4" role="alert">
+                        <p jhiTranslate="artemisApp.textAssessment.notFound"></p>
+                        <a [routerLink]="exerciseDashboardLink" class="btn btn-info btn-sm me-1 mb-1 assessment-dashboard">
+                            <span class="d-none d-md-inline" jhiTranslate="entity.action.exerciseDashboard"></span>
+                        </a>
+                    </div>
+                }
+                @if (!noNewSubmissions) {
+                    <p>No Submission for specified ID</p>
+                }
+            </div>
+        }
+    }
+</jhi-assessment-layout>
+<ng-template #assessment>
+    <div class="row">
+        <jhi-resizeable-container class="col-12">
+            <!--region Left Panel-->
+            <jhi-score-display left-header [maxPoints]="exercise?.maxPoints || 0" [maxBonusPoints]="exercise?.bonusPoints || 0" [score]="totalScore" [course]="course" />
+            <jhi-text-assessment-area
+                left-body
+                [submission]="submission!"
+                [(textBlockRefs)]="textBlockRefs"
+                [readOnly]="readOnly"
+                [highlightDifferences]="highlightDifferences"
+                (textBlockRefsChange)="validateFeedback()"
+                (textBlockRefsAddedRemoved)="recalculateTextBlockRefs()"
+                [criteria]="exercise!.gradingCriteria"
+            />
+            <!--endregion-->
+            <!--region Right Panel-->
+            <fa-icon right-header [icon]="farListAlt" />&nbsp;
+            <span right-header jhiTranslate="artemisApp.textAssessment.instructions"></span>
+            <div right-body class="alert alert-info text-center mb-4" role="alert" jhiTranslate="artemisApp.textAssessment.assessmentInstruction"></div>
+            <jhi-assessment-instructions id="instructions-card" right-body [exercise]="exercise!" class="markdown-preview" />
+            <!--endregion-->
+        </jhi-resizeable-container>
+    </div>
+    <div class="row mt-3">
+        @if (result && result.id) {
+            <jhi-unreferenced-feedback
+                [(feedbacks)]="unreferencedFeedback"
+                [highlightDifferences]="highlightDifferences"
+                (feedbacksChange)="validateFeedback()"
+                [readOnly]="readOnly"
+                [useDefaultFeedbackSuggestionBadgeText]="true"
+                [resultId]="result.id"
+            />
+        }
+    </div>
+</ng-template>

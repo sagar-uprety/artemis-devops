@@ -1,0 +1,13 @@
+<jhi-loading-indicator-container [isLoading]="isLoading">
+    @if (isInitialized) {
+        <div>
+            <div class="modal-header">
+                <h4 class="modal-title" jhiTranslate="artemisApp.pages.createTutorialFreePeriod.title"></h4>
+                <button type="button" class="btn-close" (click)="clear()"></button>
+            </div>
+            <div class="modal-body">
+                <jhi-tutorial-free-period-form [timeZone]="course?.timeZone" [isEditMode]="false" (formSubmitted)="createTutorialGroupFreePeriod($event)" />
+            </div>
+        </div>
+    }
+</jhi-loading-indicator-container>

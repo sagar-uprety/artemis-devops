@@ -1,0 +1,142 @@
+# ===================================================================
+# Spring Boot configuration for the "dev" profile.
+#
+# This configuration overrides the application.yml file.
+#
+# More information on profiles: https://www.jhipster.tech/profiles/
+# More information on configuration properties: https://www.jhipster.tech/common-application-properties/
+# ===================================================================
+
+# ===================================================================
+# Standard Spring Boot properties.
+# Full reference is available at:
+# http://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
+# ===================================================================
+
+logging:
+    level:
+        ROOT: DEBUG
+        de.tum.cit.aet.artemis: DEBUG
+        tech.jhipster: DEBUG
+        liquibase: ERROR
+
+spring:
+    devtools:
+        restart:
+            enabled: true
+        livereload:
+            enabled: false # we use the Angular dev server
+    jackson:
+        serialization:
+            indent-output: true
+    datasource:
+        type: com.zaxxer.hikari.HikariDataSource
+        url: jdbc:mysql://localhost:3306/Artemis?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC
+        username: root
+        password:
+        hikari:
+            poolName: Hikari
+            auto-commit: false
+            data-source-properties:
+                cachePrepStmts: true
+                prepStmtCacheSize: 250
+                prepStmtCacheSqlLimit: 2048
+                useServerPrepStmts: true
+    jpa:
+        show-sql: false
+    liquibase:
+        contexts: dev
+    mail:
+        host: localhost
+        port: 25
+        username:
+        password:
+    messages:
+        cache-duration: PT1S # 1 second, see the ISO 8601 standard
+    thymeleaf:
+        cache: false
+    hazelcast:
+        localInstances: true
+
+server:
+    port: 8080
+    url: http://localhost
+# ===================================================================
+# JHipster specific properties
+#
+# Full reference is available at: https://www.jhipster.tech/common-application-properties/
+# ===================================================================
+
+jhipster:
+    # CORS is only enabled by default with the "dev" profile, so the client can access the API
+    cors:
+        allowed-origin-patterns: "*"
+        allowed-methods: "*"
+        allowed-headers: "*"
+        exposed-headers: "Authorization,Link,X-Total-Count"
+        allow-credentials: true
+        max-age: 1800
+    security:
+        authentication:
+            jwt:
+                # This token must be encoded using Base64 (you can type `echo 'secret-key'|base64` on your command line)
+                base64-secret: bXktc2VjcmV0LWtleS13aGljaC1zaG91bGQtYmUtY2hhbmdlZC1pbi1wcm9kdWN0aW9uLWFuZC1iZS1iYXNlNjQtZW5jb2RlZAo=
+                # Token is valid 24 hours
+                token-validity-in-seconds: 86400
+                token-validity-in-seconds-for-remember-me: 2592000
+    mail: # specific JHipster mail property, for standard properties see MailProperties
+        from: artemis@localhost
+        base-url: http://127.0.0.1:8080
+    logging:
+        use-json-format: false # By default, logs are not in Json format
+        logstash: # Forward logs to logstash over a socket, used by LoggingConfiguration
+            enabled: false
+            host: localhost
+            port: 5000
+            ring-buffer-size: 512
+    audit-events:
+        retention-period: 120 # Number of days before audit events are deleted.
+
+# Properties to be exposed on the /info management endpoint
+info:
+    # Specifies whether text assessment analytics service (TextAssessmentEventResource) is enabled/disabled
+    # default value set to true for development environment
+    textAssessmentAnalyticsEnabled: true
+    operatorName: Some Artemis Operator # Must be set before starting the application in production. Shown in the about us page and sent to the telemetry service (e.g. the name of the university "Technische Universität München")
+    operatorAdminName: Admin # Can be set to be shown in the about us page, and to be sent to the telemetry service
+    contact: admin@uni.de # The admins contact email address, shown in the about us page, and sent to the telemetry service
+
+# Eureka configuration
+eureka:
+    instance:
+        prefer-ip-address: true
+    client:
+        enabled: false # By default, the JHipster Registry is not used in the "dev" profile
+        service-url:
+            defaultZone: http://admin:${jhipster.registry.password}@localhost:8761/eureka/
+
+# Theia configuration
+theia:
+    portal-url: https://theia.artemis.cit.tum.de
+
+    images:
+        java:
+            Java-17: "java-17-latest"
+            Java-Test: "java-17-latest"
+            Java-Test2: "java-17-latest"
+        c:
+            C: "c-latest"
+
+artemis:
+    push-notification-relay: https://hermes-sandbox.artemis.cit.tum.de
+    # Telemetry service: disabled for development
+    telemetry:
+        enabled: false # Disable sending any telemetry information to the telemetry service by setting this to false
+        sendAdminDetails: false # Include the admins email and name in the telemetry data. Set to false to disable
+        destination: https://telemetry.artemis.cit.tum.de
+    version-control:
+        local-vcs-repo-path: ./local-vcs-repos
+
+helios:
+  status:
+    enabled: false

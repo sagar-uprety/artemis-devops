@@ -1,0 +1,87 @@
+<div class="editable-instruction-container">
+    <!-- The position of the markdown-editor in the html should not be changed, as it is used for resizing!-->
+    @if (exercise) {
+        <jhi-markdown-editor-monaco
+            class="overflow-hidden flex-grow-1"
+            [domainActions]="domainActions"
+            [artemisIntelligenceActions]="artemisIntelligenceActions()"
+            [initialEditorHeight]="initialEditorHeight"
+            [useDefaultMarkdownEditorOptions]="false"
+            [enableResize]="enableResize"
+            [markdown]="exercise.problemStatement"
+            [showDefaultPreview]="false"
+            (onPreviewSelect)="generateHtml()"
+            (markdownChange)="updateProblemStatement($event)"
+        >
+            <jhi-programming-exercise-instructions
+                id="previewMonaco"
+                class="editable-instruction-container__instructions"
+                [participation]="participation"
+                [exercise]="exercise"
+                [generateHtmlEvents]="generateHtmlSubject.asObservable()"
+                [personalParticipation]="false"
+            />
+        </jhi-markdown-editor-monaco>
+    }
+    @if (editMode) {
+        <button
+            id="save-instructions-button"
+            [disabled]="savingInstructions || !unsavedChangesValue"
+            (click)="saveInstructions($event)"
+            class="btn editable-instruction-container__save"
+            [ngClass]="savingInstructions || !unsavedChangesValue ? 'btn-light' : 'btn-primary'"
+        >
+            @if (!savingInstructions) {
+                <fa-icon [icon]="faSave" class="me-2" />
+            }
+            @if (savingInstructions) {
+                <fa-icon [icon]="faCircleNotch" animation="spin" class="me-2" />
+            }
+            <span jhiTranslate="entity.action.save"></span>
+        </button>
+    }
+    @if (showStatus) {
+        <div class="card-footer text-nowrap editable-instruction-container__status">
+            <div class="instructions-status">
+                @if (!unsavedChangesValue && !savingInstructions) {
+                    <div>
+                        <fa-icon [icon]="faCheckCircle" class="text-success me-1" ngbTooltip="{{ 'artemisApp.programmingExercise.editable.savedTooltip' | artemisTranslate }}" />
+                        <span class="text-info" jhiTranslate="artemisApp.programmingExercise.editable.saved"></span>
+                    </div>
+                }
+                @if (unsavedChangesValue && !savingInstructions) {
+                    <div>
+                        <fa-icon
+                            [icon]="faExclamationTriangle"
+                            class="text-warning me-1"
+                            ngbTooltip="{{ 'artemisApp.programmingExercise.editable.unsavedTooltip' | artemisTranslate }}"
+                        />
+                        <span class="text-info" jhiTranslate="artemisApp.programmingExercise.editable.unsaved"></span>
+                    </div>
+                }
+                @if (savingInstructions) {
+                    <div>
+                        <fa-icon [icon]="faCircleNotch" class="me-1" ngbTooltip="{{ 'artemisApp.programmingExercise.editable.savingTooltip' | artemisTranslate }}" />
+                        <span class="text-info" jhiTranslate="artemisApp.programmingExercise.editable.saving"></span>
+                    </div>
+                }
+            </div>
+            @if (exercise?.id) {
+                <jhi-programming-exercise-instruction-instructor-analysis
+                    [exerciseTestCases]="exerciseTestCases"
+                    [problemStatement]="exercise.problemStatement || ''"
+                    [taskRegex]="taskRegex"
+                    (problemStatementAnalysis)="onAnalysisUpdate($event)"
+                    class="editable-instruction-container__status__testcase"
+                />
+            }
+        </div>
+    }
+    @if (showConsistencyCheck()) {
+        <div class="alert alert-warning alert-dismissible text-start fade show mt-4" role="alert">
+            <button type="button" class="btn-close" (click)="dismissConsistencyCheck()" aria-label="Close"></button>
+            <h4 class="alert-heading" jhiTranslate="artemisApp.programmingExercise.artemisIntelligence.consistencyCheckAlert.title"></h4>
+            <div [innerHtml]="renderedConsistencyCheckResultMarkdown()"></div>
+        </div>
+    }
+</div>

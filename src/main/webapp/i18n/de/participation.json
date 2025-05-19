@@ -1,0 +1,70 @@
+{
+    "artemisApp": {
+        "participation": {
+            "home": {
+                "title": "Teilnahmen",
+                "createLabel": "Teilnahme erstellen"
+            },
+            "created": "Teilnahme erstellt mit ID {{ param }}",
+            "updated": "Teilnahme von {{ param }} aktualisiert",
+            "deleted": "Teilnahme von {{ param }} gelöscht",
+            "delete": {
+                "question": "Soll die Teilnahme von <strong>{{ title }}</strong> wirklich dauerhaft gelöscht werden?"
+            },
+            "cleanupBuildPlan": {
+                "question": "Soll der Build-Plan der Teilnahme von <strong>{{ title }}</strong> wirklich gelöscht werden?"
+            },
+            "addPresentation": {
+                "label": "Füge Präsentation hinzu",
+                "error": "Die Präsentation konnte nicht hinzugefügt werden. Bitte versuche es nochmal."
+            },
+            "savePresentation": {
+                "label": "Sichere Präsentation",
+                "error": "Die Präsentationsnote konnte nicht hinzugefügt werden. Bitte versuche es nochmal."
+            },
+            "removePresentation": {
+                "label": "Entferne Präsentation",
+                "error": "Die Präsentation konnte nicht entfernt werden. Bitte versuche es nochmal."
+            },
+            "updateDueDates": {
+                "success": "Die individuellen Einreichungsfrist wurden für {{ count }} Teilnehmende aktualisiert.",
+                "error": "Die individuellen Einreichungsfrist konnten nicht aktualisiert werden."
+            },
+            "detail": {
+                "title": "Teilnahme"
+            },
+            "errors": {
+                "preconditionsNotMet": "Die Voraussetzungen für die Anforderung von KI-Feedback sind nicht erfüllt."
+            },
+            "repository": "Repository",
+            "buildPlanId": "Build-Plan-Link",
+            "initializationState": "Status",
+            "initializationDate": "Teilnahme Start",
+            "individualDueDate": "Einreichungsfrist",
+            "initializationNotYetStarted": "Noch nicht gestartet",
+            "presentationScore": "Präsentation",
+            "presentationGrade": "Präsentationsnote",
+            "results": "Ergebnisse",
+            "student": "Student",
+            "team": "Team",
+            "students": "Studierende",
+            "practice": "Übungsmodus",
+            "templateParticipation": "Template-Teilnahme",
+            "solutionParticipation": "Lösungsteilnahme",
+            "noParticipation": "Die Teilnahme konnte nicht gefunden werden!",
+            "exercise": "Übung",
+            "deleteRepository": "Repository löschen",
+            "deleteBuildPlan": "Build-Plan löschen",
+            "participationSubmission": {
+                "submissionType": "Abgabentyp",
+                "submissionDate": "Abgabedatum",
+                "resultCount": "Anzahl Ergebnisse",
+                "results": "Ergebnisse",
+                "assessor": "Bewertet von",
+                "submissionsForParticipation": "Abgaben von {{ participant }} für die Übung {{ exercise }}",
+                "action": "Aktion",
+                "delete": "Soll diese Abgabe wirklich gelöscht werden?"
+            }
+        }
+    }
+}

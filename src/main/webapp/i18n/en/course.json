@@ -1,0 +1,304 @@
+{
+    "artemisApp": {
+        "course": {
+            "searchForCourse": "Search for a course...",
+            "home": {
+                "title": "Courses",
+                "createLabel": "Create new course",
+                "editLabel": "Edit course"
+            },
+            "created": "Created new course with title {{ param }}",
+            "updated": "Updated Course with title {{ param }}",
+            "deleted": "Deleted Course with title {{ param }}",
+            "delete": {
+                "question": "Are you sure you want to permanently delete the course <strong>{{ title }}</strong>? All associated elements will be deleted, including exams, exercises, repositories and build plans. This action can NOT be undone!",
+                "typeNameToConfirm": "Please type in the name of the course to confirm.",
+                "icon": "Remove Icon",
+                "summary": {
+                    "title": "Course Summary",
+                    "numberExams": "Number of Exams",
+                    "numberLectures": "Number of Lectures",
+                    "numberStudents": "Number of Students",
+                    "numberTutors": "Number of Tutors",
+                    "numberEditors": "Number of Editors",
+                    "numberInstructors": "Number of Instructors",
+                    "numberProgrammingExercises": "Number of Programming Exercises",
+                    "numberModelingExercises": "Number of Modeling Exercises",
+                    "numberTextExercises": "Number of Text Exercises",
+                    "numberFileUploadExercises": "Number of File Upload Exercises",
+                    "numberQuizExercises": "Number of Quiz Exercises",
+                    "numberRepositories": "Number of Repositories",
+                    "numberBuilds": "Number of Builds",
+                    "numberCommunicationPosts": "Number of Communication Posts",
+                    "numberAnswerPosts": "Number of Answer Posts",
+                    "isTestCourse": "Test Course"
+                }
+            },
+            "archive": {
+                "title": "Archive",
+                "sort": "Sort",
+                "tip": "The archive enables you to view all your past courses, organized by semester. Click on a semester to expand and see the courses you were enrolled in during that period.",
+                "noCoursesPreviousSemester": "No courses found from previous semesters",
+                "winterSemester": "Winter semester 20{{ param }}",
+                "summerSemester": "Summer semester 20{{ param }}"
+            },
+            "showActive": "Show only active courses",
+            "totalScore": "Total Score:",
+            "title": "Title",
+            "color": "Color",
+            "courseIcon": "Course Icon",
+            "shortName": "Short Name",
+            "maxComplaints": {
+                "title": "Maximum number of complaints per student",
+                "description": "Set the maximum number of complaints allowed per student. Accepted complaints do not count toward this quota. This limit applies only to individual exercises."
+            },
+            "maxTeamComplaints": {
+                "title": "Maximum number of complaints per team",
+                "description": "Set the maximum number of complaints allowed per team. Accepted complaints do not count toward this quota. This limit applies only to team exercises."
+            },
+            "maxComplaintTimeDays": {
+                "title": "Complaint due date in days after result date",
+                "description": "This number refers to days after the result is available (assessment due date or result date, depending on which one is later). Students will not be able to submit any more complaints after this due date."
+            },
+            "maxComplaintTextLimit": {
+                "title": "Maximum number of characters per complaint",
+                "description": "This value indicates the maximum number of characters a student may use per complaint."
+            },
+            "maxComplaintResponseTextLimit": {
+                "title": "Maximum number of characters per complaint response",
+                "description": "This value indicates the maximum number of characters that may be used for the response per complaint."
+            },
+            "complaintsEnabled": {
+                "title": "Enable complaints",
+                "description": "Enabling this allows students to complain about assessments."
+            },
+            "requestMoreFeedbackEnabled": {
+                "title": "Enable more feedback requests",
+                "description": "This option allows students to request more feedback without complaining. Asking for further feedback will not count towards the number of complaints, but it will also not allow modification of the assessment. By default, this option is enabled, but it can be disabled if assessment corrections must always be possible."
+            },
+            "maxRequestMoreFeedbackTimeDays": {
+                "title": "More feedback request due date in days after result date",
+                "description": "This number refers to days after the result is available (assessment due date or result date, depending on which one is later). Students will not be able to request more feedback after this due date."
+            },
+            "customizeGroupNames": {
+                "title": "Customize group names",
+                "description": "Customizing the group names should not be necessary and may cause users to lose access to this course. Make sure you have a good reason for customizing the group names."
+            },
+            "studentGroupName": "Students",
+            "teachingAssistantGroupName": "Tutors",
+            "editorGroupName": "Editors",
+            "instructorGroupName": "Instructors",
+            "description": "Course Description",
+            "organizations": "Course Organizations",
+            "startDate": "Start",
+            "endDate": "End",
+            "semester": "Semester",
+            "ltiConfiguration": "LTI Configuration",
+            "recentlyAccessed": "Recently accessed",
+            "maxPoints": {
+                "title": "Maximum number of points for course",
+                "info": "This value is used for example calculations (e.g. in the grading key) and does not influence the students' grades. The grades are calculated based on the points achievable in the course."
+            },
+            "accuracyOfScores": "Number of decimal places used for calculating the scores",
+            "defaultProgrammingLanguage": "Default Programming Language",
+            "gradingSystem": "Grading Key",
+            "testCourse": {
+                "title": "Test Course",
+                "description": "Activate this checkbox for courses used for testing.",
+                "plural": "Test Courses"
+            },
+            "accessGroups": "Access Groups",
+            "learningPaths": {
+                "label": "Learning Paths Enabled",
+                "tooltip": "Enables generation of individualized learning paths for students consisting of competencies and their linked learning materials."
+            },
+            "dashboard": {
+                "label": "Student Course Analytics Dashboard Enabled",
+                "tooltip": "Activates the course analytics dashboard for the course for students, tutors and instructors. The dashboard enables users to track their progress and performance in the course."
+            },
+            "restrictedAthenaModulesAccess": {
+                "label": "Access to Restricted Athena Modules Enabled",
+                "tooltip": "If this option is selected, the course's exercises can also use restricted Athena modules for feedback generation."
+            },
+            "onlineCourse": {
+                "title": "Online Course",
+                "description": "Activate this checkbox for external online courses (e.g. on edX/Moodle) so that students can use this Artemis course (via the LTI interface). This also allows automatic account creation if enabled by the Artemis system administrator. You can further configure this in the LTI Configuration page."
+            },
+            "courseCommunicationSetting": {
+                "communicationEnabled": {
+                    "label": "Communication Enabled",
+                    "tooltip": "Enables communication between course users in private or public channels which can only be created by instructors and tutors. Students can interact with peers and ask questions while moderators can provide course information and answer content-related questions. The communication can happen directly on the page of the respective exercise or lecture or in the dedicated communication space of the course."
+                },
+                "messagingEnabled": {
+                    "label": "Direct Messages / Group Chats Enabled",
+                    "tooltip": "Enables messaging between course users in group chats or direct messages. Every user can start a direct message, private group chat and add other users. A group chat is limited to 10 members. The chats happen in the communication space of the course.",
+                    "codeOfConduct": "Messaging Code of Conduct"
+                },
+                "faqEnabled": {
+                    "label": "FAQ enabled",
+                    "tooltip": "Enables the creation of FAQ entries where instructors can compile frequently asked questions in an organized manner. Students can access this knowledge base to independently review topics and resolve their questions on their own."
+                }
+            },
+            "enrollmentEnabled": {
+                "title": "Student Course Enrollment Enabled",
+                "description": "Activate this checkbox to allow students to enroll independently in the course if it is active (between start and end of the course). You can optionally enter a message that students have to confirm during enrollment."
+            },
+            "enrollmentStartDate": "Enrollment Start",
+            "enrollmentEndDate": "Enrollment End",
+            "enrollmentConfirmationMessage": "Enrollment Confirmation Message",
+            "unenrollmentEnabled": {
+                "title": "Student Course Unenrollment Enabled",
+                "description": "Activate this checkbox to allow students to unenroll independently in the course. You can specify the latest date for unenrollment, otherwise the students can do so until the end of the course."
+            },
+            "unenrollmentEndDate": "Latest date to unenroll",
+            "exercises": "Exercises",
+            "programmingExercises": "Programming Exercises",
+            "quizExercises": "Quiz Exercises",
+            "modelingExercises": "Modeling Exercises",
+            "textExercises": "Text Exercises",
+            "upload": "Upload",
+            "uploading": "Uploading...",
+            "fileUploadExercises": "File Upload Exercises",
+            "exercise": {
+                "search": {
+                    "searchButton": "Search",
+                    "searchPlaceholder": "Search...",
+                    "resetButton": "Reset",
+                    "toggleButton": {
+                        "true": "Hide Advanced Search",
+                        "false": "Show Advanced Search"
+                    },
+                    "cardTitle": "Search Exercises",
+                    "labelExerciseName": "Search by exercise name",
+                    "fieldExerciseName": "Exercise name",
+                    "labelExerciseCategory": "Category",
+                    "fieldExerciseCategory": "Category",
+                    "labelExerciseType": "Exercise Type",
+                    "noResults": "No exercises matching this search query were found",
+                    "type": {
+                        "all": "All Exercises",
+                        "programming": "Programming Exercises",
+                        "quiz": "Quiz Exercises",
+                        "modeling": "Modeling Exercises",
+                        "text": "Text Exercises",
+                        "file-upload": "File Upload Exercises"
+                    }
+                }
+            },
+            "students": "Students",
+            "participations": "Participation",
+            "tutors": "Tutors",
+            "editors": "Editors",
+            "instructors": "Instructors",
+            "student": "Student",
+            "tutor": "Tutor",
+            "reviewer": "Reviewer",
+            "editor": "Editor",
+            "instructor": "Instructor",
+            "form": {
+                "shortname": {
+                    "minlength": "Short Name must contain at least 3 characters.",
+                    "forbidden": "Short Name must start with a letter and cannot contain special characters."
+                },
+                "startDate": {
+                    "invalid": "Must be before the end date of the course"
+                },
+                "endDate": {
+                    "invalid": "Must be after the start date of the course"
+                },
+                "enrollmentStartDate": {
+                    "invalid": "Can't be after the start date of the course and must be before the enrollment end date"
+                },
+                "enrollmentEndDate": {
+                    "invalid": "Can't be after the end date of the course and must be after the enrollment start date"
+                },
+                "unenrollmentEndDate": {
+                    "invalid": "Must be after enrollment end date and can not be after the end date of the course"
+                },
+                "invalidForm": "Please fill in all required fields."
+            },
+            "courseDashboard": "Course Dashboard",
+            "instructorDashboard": "Instructor Course Dashboard",
+            "courseGroup": {
+                "outOf": "out of",
+                "usersPerPage": "{{number}} users per page",
+                "showAllUsers": "Show all users",
+                "searchForUsers": "Add a user to this group by searching for login or name",
+                "searchNoResults": "No users found",
+                "login": "Login",
+                "registrationNumber": "Registration Number",
+                "name": "Name",
+                "email": "Email",
+                "removeFromGroup": {
+                    "modalQuestion": "Are you sure you want to remove the user with login <strong>{{ title }}</strong> from this course group?"
+                },
+                "profilePicture": "Profile Picture"
+            },
+            "averageScore": "Average Score",
+            "releasedSoon": "Released Soon",
+            "currentWorking": "Currently In Progress",
+            "inAssessment": "Currently In Assessment",
+            "pastExercises": "Past Exercises ({{ amount }} of {{ total }})",
+            "noExercises": "No active exercises to display",
+            "assessmentProgress": "Assessments",
+            "releaseDate": "Release",
+            "dueDate": "Due",
+            "assessmentDueDate": "Assessment Due",
+            "cleanup": {
+                "title": "Cleanup",
+                "question": "Are you sure you want to clean up the course <strong>{{ title }}</strong>? This will delete all student programming exercise repositories for course <strong>exercises</strong> and <strong>exams</strong>. This action can <strong class='text-danger'>NOT</strong> be undone!"
+            },
+            "detail": {
+                "title": "Course Details:",
+                "sections": {
+                    "general": "General Information",
+                    "mode": "Mode",
+                    "enrollment": "Enrollment",
+                    "messaging": "Messages & Communication"
+                },
+                "assessmentsTitle": "Total Assessments",
+                "complaintsTitle": "Total Complaints",
+                "moreFeedbackTitle": "More Feedback Requests",
+                "averageStudentScoreTitle": "Average Student Score",
+                "currentTotalLLMCostTitle": "Total LLM Cost"
+            },
+            "activeStudents": "Active students: {{ students }}",
+            "notStartedYet": "The course has not officially started yet. Official course start:",
+            "noOrganizations": "No Organizations",
+            "organizationAddingHint": "Administrators can add organizations to courses.",
+            "imageCropper": {
+                "title": "Crop your image",
+                "uploadTitle": "Add an icon"
+            },
+            "overview": "Overview"
+        },
+        "courseStatistics": {
+            "statistics": "Statistics",
+            "course": "Course",
+            "courseAverage": "Course average",
+            "exerciseAverage": "exercise average",
+            "amountOfStudents": "# of students",
+            "activeStudents": "Active students",
+            "activeStudentsExplanation": "Active students are students that submitted at least once in the corresponding week.",
+            "average": "Average: ",
+            "exerciseType": "Exercise type",
+            "programming": "Programming",
+            "quiz": "Quiz",
+            "modeling": "Modeling",
+            "text": "Text",
+            "file-upload": "File Upload",
+            "chartLegend": {
+                "lowest": "Lowest performing third",
+                "average": "Average performing third",
+                "best": "Best performing third"
+            },
+            "calendarWeek": "Calendar Week",
+            "scopeButton": {
+                "period": "{{ amount }}W",
+                "periodTooltip": "Activity of the last {{ amount }} weeks.",
+                "overview": "Max",
+                "overviewTooltip": "Activity since the course start date till now."
+            }
+        }
+    }
+}

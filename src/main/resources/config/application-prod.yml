@@ -1,0 +1,121 @@
+# ===================================================================
+# Spring Boot configuration for the "prod" profile.
+#
+# This configuration overrides the application.yml file.
+#
+# More information on profiles: https://www.jhipster.tech/profiles/
+# More information on configuration properties: https://www.jhipster.tech/common-application-properties/
+# ===================================================================
+
+# ===================================================================
+# Standard Spring Boot properties.
+# Full reference is available at:
+# http://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
+# ===================================================================
+
+artemis:
+    push-notification-relay: https://hermes.artemis.cit.tum.de
+    # Artemis sends the artemis version, the university name, the universities main admin contact, (email + name), the server url,
+    # and used profiles (localVC, ...) to a telemetry collection service.
+    telemetry:
+        enabled: true # Disable sending any telemetry information to the telemetry service by setting this to false
+        sendAdminDetails: true # Include personal identifiable information of the admin, including email and name in the telemetry data
+        destination: https://telemetry.artemis.cit.tum.de
+
+spring:
+    devtools:
+        restart:
+            enabled: false
+        livereload:
+            enabled: false
+    datasource:
+        type: com.zaxxer.hikari.HikariDataSource
+        url: jdbc:mysql://localhost:3306/Artemis?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC
+        username: root
+        password:
+        hikari:
+            poolName: Hikari
+            auto-commit: false
+            data-source-properties:
+                cachePrepStmts: true
+                prepStmtCacheSize: 250
+                prepStmtCacheSqlLimit: 2048
+                useServerPrepStmts: true
+    jpa:
+        show-sql: false
+    mail:
+        host: localhost
+        port: 25
+        username:
+        password:
+    thymeleaf:
+        cache: true
+
+# ===================================================================
+# To enable TLS in production, generate a certificate using:
+# keytool -genkey -alias artemis -storetype PKCS12 -keyalg RSA -keysize 2048 -keystore keystore.p12 -validity 3650
+#
+# You can also use Let's Encrypt:
+# https://maximilian-boehm.com/hp2121/Create-a-Java-Keystore-JKS-from-Let-s-Encrypt-Certificates.htm
+#
+# Then, modify the server.ssl properties so your "server" configuration looks like:
+#
+# server:
+#    port: 443
+#    ssl:
+#        key-store: classpath:config/tls/keystore.p12
+#        key-store-password: password
+#        key-store-type: PKCS12
+#        key-alias: Artemis
+#        # The ciphers suite enforce the security by deactivating some old and deprecated SSL cipher, this list was tested against SSL Labs (https://www.ssllabs.com/ssltest/)
+#        ciphers: TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 ,TLS_DHE_RSA_WITH_AES_128_GCM_SHA256 ,TLS_DHE_RSA_WITH_AES_256_GCM_SHA384 ,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384,TLS_DHE_RSA_WITH_AES_128_CBC_SHA256,TLS_DHE_RSA_WITH_AES_128_CBC_SHA,TLS_DHE_RSA_WITH_AES_256_CBC_SHA256,TLS_DHE_RSA_WITH_AES_256_CBC_SHA,TLS_RSA_WITH_AES_128_GCM_SHA256,TLS_RSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_128_CBC_SHA256,TLS_RSA_WITH_AES_256_CBC_SHA256,TLS_RSA_WITH_AES_128_CBC_SHA,TLS_RSA_WITH_AES_256_CBC_SHA,TLS_DHE_RSA_WITH_CAMELLIA_256_CBC_SHA,TLS_RSA_WITH_CAMELLIA_256_CBC_SHA,TLS_DHE_RSA_WITH_CAMELLIA_128_CBC_SHA,TLS_RSA_WITH_CAMELLIA_128_CBC_SHA
+# ===================================================================
+server:
+    port: 8080
+    compression:
+        enabled: true
+        mime-types: text/html,text/xml,text/plain,text/css,application/javascript,application/json,image/svg+xml
+        min-response-size: 1024
+
+# ===================================================================
+# JHipster specific properties
+#
+# Full reference is available at: https://www.jhipster.tech/common-application-properties/
+# ===================================================================
+
+jhipster:
+    http:
+        cache: # Used by the CachingHttpHeadersFilter
+            timeToLiveInDays: 1461
+    security:
+        authentication:
+            jwt:
+                # This token must be encoded using Base64 (you can type `echo 'secret-key'|base64` on your command line)
+                # As this is the PRODUCTION configuration, you MUST change the default key, and store it securely:
+                # - In the JHipster Registry (which includes a Spring Cloud Config server)
+                # - In a separate `application-prod.yml` file, in the same folder as your executable WAR file
+                # - In the `JHIPSTER_SECURITY_AUTHENTICATION_JWT_BASE64SECRET` environment variable
+                # base64-secret: ""
+                # Token is valid 24 hours
+                token-validity-in-seconds: 86400 # Token is valid 24 hours
+                token-validity-in-seconds-for-remember-me: 2592000 # Token is valid 30 days (e.g. when using username/password authentication)
+    mail: # specific JHipster mail property, for standard properties see MailProperties
+        from: artemis@localhost
+        base-url: http://my-server-url-to-change # Modify according to your server's URL
+    logging:
+        logstash: # Forward logs to logstash over a socket, used by LoggingConfiguration
+            enabled: false
+            host: localhost
+            port: 5000
+            ring-buffer-size: 512
+    audit-events:
+        retention-period: 120 # Number of days before audit events and VCS access logs are deleted.
+# Properties to be exposed on the /info management endpoint
+info:
+    testServer: false  # false --> production, true --> test server, --> empty == local
+    # Specifies whether text assessment analytics service (TextAssessmentEventResource) is enabled/disabled
+    # default value set to false in production
+    textAssessmentAnalyticsEnabled: false
+    operatorName: # Must be set before starting the application in production. Shown in the about us page and sent to the telemetry service (e.g. university or school)
+    operatorAdminName: # Can be set before starting the application in production. Shown in the about us page and used by the telemetry service
+    contact: # The admins contact email address, shown in the about us page, and sent to the telemetry service

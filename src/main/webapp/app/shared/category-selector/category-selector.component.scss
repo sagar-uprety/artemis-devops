@@ -1,0 +1,64 @@
+jhi-category-selector {
+    .category-chip-list {
+        width: 100%;
+
+        .category-chip {
+            padding: 0 !important;
+            height: 30px !important;
+            border-radius: 0.25rem !important;
+            background: transparent !important;
+
+            .custom-tag {
+                padding: 0.15rem 0.45rem;
+                background: #ccc;
+                border-radius: 0.25rem;
+                color: #fff;
+
+                display: flex;
+                align-items: center;
+
+                &:hover {
+                    opacity: 0.8;
+                }
+
+                .category-chip-remove {
+                    color: #fff;
+                }
+            }
+        }
+    }
+
+    .category-chip-input {
+        color: var(--text-editor-color);
+    }
+}
+
+.mdc-text-field--outlined .mat-mdc-form-field-infix,
+.mdc-text-field--no-label .mat-mdc-form-field-infix {
+    padding-top: var(--mat-form-field-container-vertical-padding, 0.5rem) !important;
+    padding-bottom: var(--mat-form-field-container-vertical-padding, 0.5rem) !important;
+    min-height: var(--mat-form-field-container-height, 1.75rem) !important;
+}
+
+.mat-mdc-standard-chip.mdc-evolution-chip--with-trailing-action .mdc-evolution-chip__action--primary {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+/* Otherwise each custom tag will have an additional border */
+.mat-mdc-standard-chip .mdc-evolution-chip__action--primary::before {
+    border-style: none !important;
+}
+
+/* Otherwise the x will jump when opening the colorpicker */
+.remove-button::before {
+    position: absolute;
+}
+
+.tag-option {
+    background: #fff;
+
+    &:hover {
+        background: #ccc;
+    }
+}

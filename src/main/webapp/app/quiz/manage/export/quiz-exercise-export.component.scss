@@ -1,0 +1,14 @@
+.edit-quiz-footer {
+    height: 80px;
+    position: sticky;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    border-top: 1px solid var(--border-color);
+    background: var(--edit-quiz-footer-background);
+
+    .container {
+        height: 100%;
+    }
+}
