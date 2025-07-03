@@ -1,0 +1,26 @@
+apiVersion: v1
+data:
+  SPRING_DATASOURCE_URL: jdbc:mysql://artemis-mysql/artemis?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true
+  SPRING_DATASOURCE_USERNAME: root
+  SPRING_DATASOURCE_PASSWORD: ""
+  SPRING_LIQUIBASE_ENABLED: "false"
+  SPRING_JPA_HIBERNATE_DDL_AUTO: update
+  SPRING_PROFILES_ACTIVE: dev,artemis,scheduling
+  server.url: http://localhost:8080
+  server.port: "8080"
+  spring.jpa.properties.hibernate.cache.use_second_level_cache: "false"
+  spring.jpa.properties.hibernate.cache.use_query_cache: "false"
+  artemis.file-upload-path: /artemisdata/uploads
+  artemis.submission-export-path: /artemisdata/exports
+  artemis.repo-clone-path: /artemisdata/repos
+  artemis.repo-download-clone-path: /artemisdata/repos-download
+  artemis.atlas.enabled: "false"
+  artemis.user-management.passkey.enabled: "false"
+  artemis.exam.enabled: "false"
+  artemis.plagiarism.enabled: "false"
+  artemis.text.enabled: "false"
+  artemis.tutorialgroup.enabled: "false"
+
+kind: ConfigMap
+metadata:
+  name: artemis-app

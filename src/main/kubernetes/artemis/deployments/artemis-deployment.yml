@@ -1,0 +1,95 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    field.cattle.io/creatorId: user-gpcv5
+  labels:
+    cattle.io/creator: norman
+    workload.user.cattle.io/workloadselector: deployment-artemis-artemis
+  name: artemis
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      workload.user.cattle.io/workloadselector: deployment-artemis-artemis
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        workload.user.cattle.io/workloadselector: deployment-artemis-artemis
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        supplementalGroups: [1000]
+      containers:
+        - envFrom:
+            - configMapRef:
+                name: artemis-app
+                optional: false
+            - secretRef:
+                name: artemis-secrets
+          image: artemis:placeholder
+          imagePullPolicy: Always
+          name: artemis
+          ports:
+            - containerPort: 8080
+              name: 8080tcp02
+              protocol: TCP
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            privileged: false
+            readOnlyRootFilesystem: false
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          stdin: true
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          tty: true
+          volumeMounts:
+            - mountPath: /artemisdata/
+              name: artemis
+      imagePullSecrets:
+        - name: gitlab-read
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      terminationGracePeriodSeconds: 30
+      initContainers:
+        - name: init-ds
+          image: docker.io/library/busybox:1.37.0
+          command:
+            - "/bin/sh"
+            - "-c"
+            - |
+              while true
+              do
+                rt=$(nc -z -w 1 artemis-mysql 3306)
+                if [ $? -eq 0 ]; then
+                  echo "DB is UP"
+                  break
+                fi
+                echo "DB is not yet reachable;sleep for 10s before retry"
+                sleep 10
+              done
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 1000
+            readOnlyRootFilesystem: true
+            seccompProfile:
+              type: RuntimeDefault
+            capabilities:
+              drop: ["ALL"]
+      volumes:
+        - name: artemis
+          persistentVolumeClaim:
+            claimName: artemis
