@@ -1,0 +1,46 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: artemis
+
+resources:
+- namespace.yml
+- policy/no-unknown-registry-template.yml
+- policy/no-unknown-registry-constraint.yml
+- policy/no-privileged-template.yml
+- policy/no-privileged-constraint.yml
+- pvc/artemis-mysql.yml
+- pvc/artemis.yml
+- secrets/artemis-external-secret.yml
+- secrets/jhipster-registry-external-secret.yml
+- configmaps/application-configmap.yml
+- configmaps/artemis-configmap.yml
+- configmaps/artemis-mysql-configmap.yml
+- configmaps/kafka-configmap.yml
+- configmaps/zookeeper-configmap.yml
+- configmaps/gateway-configmap.yml
+- configmaps/jhipster-registry-configmap.yml
+- statefulsets/jhipster-registry.yml
+- statefulsets/artemis-mysql.yml
+- deployments/artemis-deployment.yml
+- deployments/zookeeper-deployment.yml
+- deployments/kafka-deployment.yml
+- deployments/gateway-deployment.yml
+- services/jhipster-registry-service.yml
+- services/mysql-service.yml
+- services/zookeeper.yml
+- services/artemis-app-service.yml
+- services/kafka-service.yml
+- ingresses/artemis-ingress.yml
+- network-policies/allow-dns-policy.yml
+- network-policies/mysql-policy.yml
+- network-policies/artemis-policy.yml
+- network-policies/jhipster-registry-policy.yml
+- network-policies/kafka-policy.yml
+- network-policies/gateway-policy.yml
+- network-policies/zookeeper-policy.yml
+- network-policies/cilium-cluster-wide-policies.yaml
+
+images:
+- name: artemis
+  newName: gitlab.lrz.de:5005/container-security-wizards/artemis/artemis
+  newTag: 8c17688e
