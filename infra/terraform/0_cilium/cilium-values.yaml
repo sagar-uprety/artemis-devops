@@ -1,0 +1,43 @@
+# Cilium configuration
+
+# Node initialization as per GKE requirements
+nodeinit:
+  enabled: true
+  reconfigureKubelet: true
+  removeCbrBridge: true
+
+# CNI configuration
+cni:
+  binPath: /home/kubernetes/bin
+  resources:
+    requests:
+      cpu: 30m
+      memory: 10Mi
+# GKE mode
+gke:
+  enabled: true
+
+# IPAM configuration
+ipam:
+  mode: kubernetes
+
+# Retrieve the native CIDR 
+# NATIVE_CIDR="$(gcloud container clusters describe "${NAME}" --zone "${ZONE}" --format 'value(clusterIpv4Cidr)')"
+# echo $NATIVE_CIDR
+
+# Native routing CIDR
+ipv4NativeRoutingCIDR: "10.76.0.0/14" # Value derived from the command above
+
+# Hubble observability (recommended addition)
+hubble:
+  enabled: true
+  ui:
+    enabled: true
+  relay:
+    enabled: true
+
+# -- Enable Internal Traffic Policy
+enableInternalTrafficPolicy: true
+# -- Enable LoadBalancer IP Address Management
+enableLBIPAM: true
+
