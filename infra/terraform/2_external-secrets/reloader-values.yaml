@@ -1,0 +1,22 @@
+reloader:
+  watchGlobally: true        # Watch all namespaces
+  reloadOnCreate: true       # Reload on create events
+  reloadOnDelete: true       # Reload on delete events
+  enableHA: true
+  deployment:
+    resources:
+      requests:
+        cpu: 30m
+        memory: 256Mi
+      limits:
+        cpu: 100m
+        memory: 512Mi
+    securityContext: 
+      runAsNonRoot: true
+      runAsUser: 1000
+      fsGroup: 2000
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: true
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: true
