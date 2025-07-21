@@ -1,0 +1,5 @@
+project_id = "online-ide-470520"
+region     = "europe-west6"
+zone       = "europe-west6-a"
+gke_cluster_name = "artemis-cluster"
+gke_cluster_location = "europe-west6-a"
