@@ -1,0 +1,193 @@
+kubernetes:
+  deployment:
+    image:
+      repository: docker.io/securesystemsengineering/connaisseur
+    pullPolicy: IfNotPresent
+    replicasCount: 1
+    resources:
+      limits:
+        cpu: 500m
+        memory: 512Mi
+      requests:
+        cpu: 50m
+        memory: 128Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
+      privileged: false
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      runAsUser: 10001
+      runAsGroup: 20001
+      seccompProfile:
+        type: RuntimeDefault
+  service:
+    type: ClusterIP
+    port: 443
+  webhook:
+    failurePolicy: Ignore
+    reinvocationPolicy: Never
+  redis:
+    image:
+      repository: redis
+      tag: 7
+    pullPolicy: Always
+    resources:
+      limits:
+        cpu: 500m
+        memory: 512Mi
+      requests:
+        cpu: 50m
+        memory: 128Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
+      privileged: false
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      runAsUser: 999
+      runAsGroup: 999
+      seccompProfile:
+        type: RuntimeDefault
+application:
+  validators:
+    - name: allow
+      type: static
+      approve: true
+    - name: deny
+      type: static
+      approve: false
+    - name: dockerhub
+      type: notaryv1
+      trustRoots:
+        - name: sse # root from sse
+          key: |
+            -----BEGIN PUBLIC KEY-----
+            MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEsx28WV7BsQfnHF1kZmpdCTTLJaWe
+            d0CA+JOi8H4REuBaWSZ5zPDe468WuOJ6f71E7WFg3CVEVYHuoZt2UYbN/Q==
+            -----END PUBLIC KEY-----
+    - name: gitlab-cosign # custom validator for gitlab cosign signatures
+      type: cosign
+      auth:
+        secretName: gitlab-read # Reference to the reflected secret
+      trustRoots:
+        - name: gitlab-cosign-key
+          key: |
+            -----BEGIN PUBLIC KEY-----
+            MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEmAHwhkvYw4+UccEqXNV5CZ+NfeVh
+            Mq73hWi2tlVvkMIvkj2NyRePcxBuysZQ92XaChAI+/Ga0Xbv+t4mePtt2g==
+            -----END PUBLIC KEY-----
+  policy:
+    # A list of image validation rules
+    - # Allow Redis images
+      pattern: "docker.io/library/redis:*"
+      validator: allow
+
+    - # Allow Postgres images
+      pattern: "docker.io/postgres:*"
+      validator: allow
+
+    - # Allow MySQL images
+      pattern: "docker.io/library/mysql:*"
+      validator: allow
+
+    - # Allow busybox images
+      pattern: "docker.io/library/busybox:*"
+      validator: allow
+
+    - # Allow Confluent images (Kafka, Zookeeper, etc.)
+      pattern: "docker.io/confluentinc/*:*"
+      validator: allow
+
+    - # Allow JHipster images
+      pattern: "docker.io/jhipster/*:*"
+      validator: allow
+
+    - # Allow all versions of kubernetes-reflector
+      pattern: "docker.io/emberstack/kubernetes-reflector:*"
+      validator: allow
+
+    - # Allow Falco security images
+      pattern: "docker.io/falcosecurity/*:*"
+      validator: allow
+
+    - pattern: "ghcr.io/ls1intum/artemis-gateway:*"
+      validator: allow
+
+    - # Allow Cilium images
+      pattern: "quay.io/cilium/*:*"
+      validator: allow
+
+    - # Allow Gatekeeper images
+      pattern: "openpolicyagent/gatekeeper:*"
+      validator: allow
+
+    - # Allow Gatekeeper CRDs image
+      pattern: "openpolicyagent/gatekeeper-crds:*"
+      validator: allow
+
+    - # Allow all versions of reloader
+      pattern: "ghcr.io/stakater/reloader:*"
+      validator: allow
+
+    - # Allow all versions of external-secrets
+      pattern: "oci.external-secrets.io/external-secrets/external-secrets:*"
+      validator: allow
+
+    - # Allow Trivy vulnerability scanner images
+      pattern: "mirror.gcr.io/aquasec/*:*"
+      validator: allow
+
+    - # Allow Aqua Security node-collector images
+      pattern: "ghcr.io/aquasecurity/node-collector:*"
+      validator: allow
+
+    - # Allow GKE system images from europe-west4
+      pattern: "europe-west4-artifactregistry.gcr.io/gke-release/**:*"
+      validator: allow
+
+    - # Allow GKE system images from europe-west6
+      pattern: "europe-west6-artifactregistry.gcr.io/gke-release/**:*"
+      validator: allow
+
+    - # Allow all images from the official k8s registry
+      pattern: "registry.k8s.io/*:*"
+      validator: allow
+
+    - # Allow GKE pause images
+      pattern: "gke.gcr.io/*:*"
+      validator: allow
+
+    - # Allow all images from securesystemsengineering and validate them with notaryv1
+      pattern: "docker.io/securesystemsengineering/*:*"
+      validator: dockerhub
+      with:
+        trustRoot: sse
+
+    - # Allow all images from our private gitlab registry and validate them with our gitlab-cosign key
+      pattern: "gitlab.lrz.de:5005/container-security-wizards/artemis/*:*"
+      validator: gitlab-cosign
+      with:
+        trustRoot: gitlab-cosign-key
+        verifyInTransparencyLog: false
+
+    - # Deny all other images by default
+      pattern: "*:*"
+      validator: deny
+
+  features:
+    automaticUnchangedApproval: false
+    automaticChildApproval: true
+    detectionMode: false # Setting to true enabls detection mode (warn and not fail)
+    namespacedValidation:
+      mode: ignore
+    resourceValidationMode: "all"
+    cache:
+      expirySeconds: 30
+      cacheErrors: true
+  logLevel: info
+  logFormat: json-pretty
