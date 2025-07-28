@@ -1,0 +1,14 @@
+falco:
+  driver:
+    kind: ebpf
+  containerd:
+    enabled: true
+    socket: /run/containerd/containerd.sock
+
+resources:
+  requests:
+    cpu: 30m
+    memory: 128Mi
+  limits:
+    cpu: 100m
+    memory: 512Mi
