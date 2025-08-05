@@ -1,0 +1,201 @@
+stages:
+  - pre-build
+  - build
+  - post-build
+
+variables:
+  CONTAINER_PATH: "gitlab.lrz.de:5005/container-security-wizards/artemis"
+
+default:
+  tags:
+    - azure-gitlab-runner
+
+# -------- Conftest -----
+dockerfile-policy:
+  stage: pre-build
+  image:
+    name: openpolicyagent/conftest:latest
+    entrypoint: [""]
+  script:
+    - conftest test docker/artemis/Dockerfile --all-namespaces
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: "$CI_COMMIT_BRANCH"
+
+# -------- Hadolint -----
+dockerfile-lint:
+  stage: pre-build
+  image: hadolint/hadolint:latest-debian
+  script:
+    - hadolint --failure-threshold error docker/artemis/Dockerfile
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: "$CI_COMMIT_BRANCH"
+
+
+# -------- Trivy Dockerfile Scan (Pre-Build) --------
+dockerfile_scanning:
+  stage: pre-build
+  image:
+    name: docker.io/aquasec/trivy:0.66.0
+    entrypoint: [""]
+  variables:
+    TRIVY_NO_PROGRESS: "true"
+    TRIVY_CACHE_DIR: ".trivycache/"
+  script:
+    - trivy --version
+    # update vulnerabilities db
+    - time trivy image --download-db-only
+    # Scan Dockerfile for misconfigurations
+    - time trivy config --exit-code 0 --severity HIGH,CRITICAL "${CI_PROJECT_DIR}/docker/artemis/Dockerfile"
+    # Scan for vulnerabilities in base images used in Dockerfile
+    - time trivy fs --exit-code 0 --security-checks vuln --severity HIGH,CRITICAL "${CI_PROJECT_DIR}/docker/artemis"
+  cache:
+    paths:
+      - .trivycache/
+  # Run on all branches and MRs
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: "$CI_COMMIT_BRANCH"
+
+# -------- Trivy Image Scan --------
+container_scanning:
+  stage: post-build
+  needs:
+    - container-build-artemis
+  image:
+    name: docker.io/aquasec/trivy:0.66.0
+    entrypoint: [""]
+  variables:
+    GIT_STRATEGY: none
+    TRIVY_USERNAME: "$CI_REGISTRY_USER"
+    TRIVY_PASSWORD: "$CI_REGISTRY_PASSWORD"
+    TRIVY_AUTH_URL: "$CI_REGISTRY"
+    TRIVY_NO_PROGRESS: "true"
+    TRIVY_CACHE_DIR: ".trivycache/"
+  script:
+    - |
+      if [ "$CI_PIPELINE_SOURCE" = "merge_request_event" ]; then
+        FULL_IMAGE_NAME="gitlab.lrz.de:5005/container-security-wizards/artemis/artemis-mr:${CI_COMMIT_SHORT_SHA}"
+      else
+        FULL_IMAGE_NAME="gitlab.lrz.de:5005/container-security-wizards/artemis/artemis:${CI_COMMIT_SHORT_SHA}"
+      fi
+      echo "Scanning image: $FULL_IMAGE_NAME"
+    - trivy --version
+    # update vulnerabilities db
+    - time trivy image --download-db-only
+    # Builds report and puts it in the default workdir $CI_PROJECT_DIR, so `artifacts:` can take it from there
+    - time trivy image --exit-code 0 --ignore-unfixed --format template --template "@/contrib/gitlab.tpl"
+      --output "$CI_PROJECT_DIR/gl-container-scanning-report.json" "$FULL_IMAGE_NAME"
+    # Prints full report
+    - time trivy image --exit-code 0 --ignore-unfixed "$FULL_IMAGE_NAME"
+    # Fail on critical vulnerabilities
+    - time trivy image --exit-code 1 --ignore-unfixed --severity CRITICAL "$FULL_IMAGE_NAME"
+  cache:
+    paths:
+      - .trivycache/
+  # Enables https://docs.gitlab.com/ee/user/application_security/container_scanning/ (Container Scanning report is available on GitLab EE Ultimate or GitLab.com Gold)
+  artifacts:
+    when: always
+    reports:
+      container_scanning: gl-container-scanning-report.json
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+
+# -------- Build Template --------
+.container-build-template:
+  stage: build
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  script:
+    - mkdir -p /kaniko/.docker
+    - echo "{\"auths\":{\"gitlab.lrz.de:5005\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_JOB_TOKEN\"},\"https://index.docker.io/v1/\":{\"username\":\"$SHARED_DOCKER_HUB_USERNAME\",\"password\":\"$SHARED_DOCKER_HUB_PAT\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor
+      --context "${CI_PROJECT_DIR}"
+      --dockerfile "${CI_PROJECT_DIR}/docker/artemis/Dockerfile"
+      --destination "$CONTAINER_PATH/${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
+      --destination "$CONTAINER_PATH/${IMAGE_NAME}:latest"
+
+# -------- Artemis Build & Push--------
+
+container-build-artemis:
+  extends: .container-build-template
+  variables:
+    CONTEXT_DIR: "docker/artemis"
+    IMAGE_NAME: "artemis"
+    NODE_OPTIONS: "--max-old-space-size=4096"
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      variables:
+        IMAGE_NAME: artemis-mr
+
+# -------- Cosign Signing --------
+.container-sign-template:
+  stage: build
+  image: alpine:3.22
+  needs: []
+  before_script:
+    - apk add --no-cache curl
+    - curl -O -L "https://github.com/sigstore/cosign/releases/download/v2.5.3/cosign-linux-amd64"
+    - mv cosign-linux-amd64 /usr/local/bin/cosign
+    - chmod +x /usr/local/bin/cosign
+  script:
+    - echo "$COSIGN_PRIVATE_KEY" | base64 -d > cosign.key
+    - export COSIGN_PASSWORD="$COSIGN_PASSWORD"
+    - echo "$CI_JOB_TOKEN" | cosign login gitlab.lrz.de:5005 --username "$CI_REGISTRY_USER" --password-stdin
+    - |
+      echo "Signing image: $CONTAINER_PATH/${IMAGE_NAME}:$CI_COMMIT_SHORT_SHA"
+      cosign sign --key cosign.key $CONTAINER_PATH/${IMAGE_NAME}:$CI_COMMIT_SHORT_SHA
+      echo "Successfully signed image: $CONTAINER_PATH/${IMAGE_NAME}:$CI_COMMIT_SHORT_SHA"
+
+container-sign-artemis:
+  extends: .container-sign-template
+  needs: [container-build-artemis]
+  variables:
+    IMAGE_NAME: "artemis"
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
+# -------- Artemis deploy template ----
+
+.update_manifest_and_commit:
+  stage: post-build
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache bash git curl openssh-client
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | base64 -d | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan gitlab.lrz.de >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+
+    - curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
+    - mv kustomize /usr/local/bin/
+
+    - git config --global user.email "bot@gitlab.com"
+    - git config --global user.name "GitLab CI Bot"
+  script:
+    - cd src/main/kubernetes/artemis
+    - kustomize edit set image "artemis=${CONTAINER_PATH}/${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
+    - |
+      if [ -z "$(git status --porcelain)" ]; then
+        echo "No changes to kustomization.yml. Nothing to commit."
+      else
+        echo "Changes detected. Committing back to the repository..."
+        git add kustomization.yml
+        git commit -m "ci: Update image tags"
+        git push git@gitlab.lrz.de:${CI_PROJECT_PATH}.git "HEAD:${CI_COMMIT_REF_NAME}" -o ci.skip
+      fi
+
+# -------- Artemis deploy --------
+
+update_manifest_and_commit:
+  extends: .update_manifest_and_commit
+  variables:
+    IMAGE_NAME: "artemis"
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
