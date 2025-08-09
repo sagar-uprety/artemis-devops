@@ -1,0 +1,18 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: allow-dns-policy
+spec:
+  description: "Allow DNS traffic to kube-system DNS"
+  endpointSelector:
+    matchLabels: {} 
+  egress:
+    # Allow DNS traffic to kube-system/kube-dns
+    - toEndpoints:
+      - matchLabels:
+          k8s-app: kube-dns
+          k8s:io.kubernetes.pod.namespace: kube-system
+      toPorts:
+        - ports:
+          - port: "53"
+            protocol: UDP
