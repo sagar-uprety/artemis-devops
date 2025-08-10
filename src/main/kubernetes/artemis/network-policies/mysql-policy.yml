@@ -1,0 +1,19 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: mysql-policy
+spec:
+  description: "Policy for MySQL database"
+  endpointSelector:
+    matchLabels:
+      app: artemis-mysql
+  ingress:
+    # Allow only traffic from Artemis application
+    - fromEndpoints:
+      - matchLabels:
+          workload.user.cattle.io/workloadselector: deployment-artemis-artemis
+      toPorts:
+        - ports:
+          - port: "3306"
+            protocol: TCP
+  egress: []
