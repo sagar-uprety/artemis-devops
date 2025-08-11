@@ -1,0 +1,51 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: zookeeper-policy
+spec:
+  description: "Policy for Zookeeper service"
+  endpointSelector:
+    matchLabels:
+      workload.user.cattle.io/workloadselector: deployment-artemis-zookeeper
+  ingress:
+    # Allow Kafka to connect to ZooKeeper
+    - fromEndpoints:
+        - matchLabels: 
+            workload.user.cattle.io/workloadselector: deployment-artemis-kafka
+      toPorts:
+        - ports:
+            - port: "2181"
+              protocol: TCP
+            - port: "8080"
+              protocol: TCP
+    # Allow Kubernetes nodes to connect to ZooKeeper
+    - fromEntities:
+        - remote-node
+        - host
+      toPorts:
+        - ports:
+            - port: "2181"
+              protocol: TCP
+            - port: "8080"
+              protocol: TCP
+  egress:
+    # Allow ZooKeeper to connect to Kubernetes nodes
+    - toEntities:
+        - remote-node
+        - host
+      toPorts:
+        - ports:
+            - port: "2181"
+              protocol: TCP
+            - port: "8080"
+              protocol: TCP
+    # Allow DNS resolution
+    - toEndpoints:
+      - matchLabels:
+          k8s-app: kube-dns
+      toPorts:
+        - ports:
+          - port: "53"
+            protocol: UDP
+          - port: "53"
+            protocol: TCP

@@ -1,0 +1,51 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: kafka-policy
+spec:
+  description: "Policy for Kafka messaging service"
+  endpointSelector:
+    matchLabels:
+      workload.user.cattle.io/workloadselector: deployment-artemis-kafka
+  ingress:
+    # Allow traffic from Artemis application
+    - fromEndpoints:
+      - matchLabels:
+          workload.user.cattle.io/workloadselector: deployment-artemis-artemis
+      toPorts:
+        - ports:
+          - port: "9092"
+            protocol: TCP
+    # Allow traffic from Gateway (if it becomes active)
+    - fromEndpoints:
+      - matchLabels:
+          workload.user.cattle.io/workloadselector: deployment-artemis-gateway
+      toPorts:
+        - ports:
+          - port: "9092"
+            protocol: TCP
+  egress:
+    # Allow communication with Zookeeper
+    - toEndpoints:
+      - matchLabels:
+          workload.user.cattle.io/workloadselector: deployment-artemis-zookeeper
+      toPorts:
+        - ports:
+          - port: "2181"
+            protocol: TCP
+    # Allow communication with Artemis application (for callbacks, if needed)
+    - toEndpoints:
+      - matchLabels:
+          workload.user.cattle.io/workloadselector: deployment-artemis-artemis
+      toPorts:
+        - ports:
+          - port: "8080"
+            protocol: TCP
+    # Allow communication with Gateway (if it becomes active)
+    - toEndpoints:
+      - matchLabels:
+          workload.user.cattle.io/workloadselector: deployment-artemis-gateway
+      toPorts:
+        - ports:
+          - port: "8080"
+            protocol: TCP
