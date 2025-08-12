@@ -1,0 +1,34 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: gateway-policy
+spec:
+  description: "Policy for Gateway service (minimal, as it's not actively used)"
+  endpointSelector:
+    matchLabels:
+      workload.user.cattle.io/workloadselector: deployment-artemis-gateway
+  ingress:
+    # Allow potential traffic to the Gateway
+    - fromEntities:
+      - world
+      toPorts:
+        - ports:
+          - port: "8080"
+            protocol: TCP
+  egress:
+    # Allow Gateway to communicate with JHipster Registry
+    - toEndpoints:
+      - matchLabels:
+          app: jhipster-registry
+      toPorts:
+        - ports:
+          - port: "8761"
+            protocol: TCP
+    # Allow Gateway to communicate with Kafka
+    - toEndpoints:
+      - matchLabels:
+          workload.user.cattle.io/workloadselector: deployment-artemis-kafka
+      toPorts:
+        - ports:
+          - port: "9092"
+            protocol: TCP

@@ -1,0 +1,83 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: jhipster-registry-policy
+  namespace: artemis
+spec:
+  endpointSelector:
+    matchLabels:
+      app: jhipster-registry
+  ingress:
+  # Allow JHipster Registry instances to communicate with each other
+  - fromEndpoints:
+    - matchLabels:
+        app: jhipster-registry
+    toPorts:
+    - ports:
+      - port: "8761"
+        protocol: TCP
+  # Allow access from Artemis application
+  - fromEndpoints:
+    - matchLabels:
+        workload.user.cattle.io/workloadselector: deployment-artemis-artemis
+    toPorts:
+    - ports:
+      - port: "8761"
+        protocol: TCP
+  # Allow access from Gateway
+  - fromEndpoints:
+    - matchLabels:
+        workload.user.cattle.io/workloadselector: deployment-artemis-gateway
+    toPorts:
+    - ports:
+      - port: "8761"
+        protocol: TCP
+  # Allow access from Kubernetes nodes
+  - fromEntities:
+    - remote-node
+    - host
+    toPorts:
+    - ports:
+      - port: "8761"
+        protocol: TCP
+  # Allow headless service access (StatefulSet DNS pattern)
+  - fromEntities:
+    - cluster
+    toPorts:
+    - ports:
+      - port: "8761"
+        protocol: TCP
+  egress:
+  # Allow JHipster Registry instances to communicate with each other
+  - toEndpoints:
+    - matchLabels:
+        app: jhipster-registry
+    toPorts:
+    - ports:
+      - port: "8761"
+        protocol: TCP
+  # Allow communication to Kubernetes nodes
+  - toEntities:
+    - remote-node
+    - host
+    toPorts:
+    - ports:
+      - port: "8761"
+        protocol: TCP
+  # Allow DNS resolution (essential for service discovery)
+  - toEndpoints:
+    - matchLabels:
+        k8s-app: kube-dns
+    toPorts:
+    - ports:
+      - port: "53"
+        protocol: UDP
+      - port: "53"
+        protocol: TCP
+  # Allow outbound connections to cluster services for StatefulSet DNS resolution
+  - toEntities:
+    - cluster
+    toPorts:
+    - ports:
+      - port: "8761"
+        protocol: TCP
