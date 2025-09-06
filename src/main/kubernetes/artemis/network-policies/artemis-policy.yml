@@ -1,0 +1,49 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: artemis-policy
+spec:
+  description: "Policy for Artemis application"
+  endpointSelector:
+    matchLabels:
+      workload.user.cattle.io/workloadselector: deployment-artemis-artemis
+  ingress:
+    # Allow all external traffic to reach the application
+    - fromEntities:
+      - world
+      toPorts:
+        - ports:
+          - port: "8080"
+            protocol: TCP
+    # Allow traffic from within the cluster
+    - fromEndpoints:
+      - {}
+      toPorts:
+        - ports:
+          - port: "8080"
+            protocol: TCP
+  egress:
+    # Allow Artemis to communicate with MySQL
+    - toEndpoints:
+      - matchLabels:
+          workload.user.cattle.io/workloadselector: statefulSet-artemis-artemis-mysql
+      toPorts:
+        - ports:
+          - port: "3306"
+            protocol: TCP
+    # Allow Artemis to communicate with Kafka
+    - toEndpoints:
+      - matchLabels:
+          workload.user.cattle.io/workloadselector: deployment-artemis-kafka
+      toPorts:
+        - ports:
+          - port: "9092"
+            protocol: TCP
+    # Allow Artemis to communicate with JHipster Registry
+    - toEndpoints:
+      - matchLabels:
+          app: jhipster-registry
+      toPorts:
+        - ports:
+          - port: "8761"
+            protocol: TCP
