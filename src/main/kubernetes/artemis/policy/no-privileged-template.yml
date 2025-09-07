@@ -1,0 +1,35 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: no-privileged-container
+  namespace: artemis
+  annotations:
+    description: Forbids running of privileged containers.
+spec:
+  crd:
+    spec:
+      names:
+        kind: no-privileged-container
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package privtest
+
+        input_containers[c] {
+            c := input.review.object.spec.template.spec.containers[_]
+        }
+        input_containers[c] {
+            c := input.review.object.spec.template.spec.initContainers[_]
+        }
+        input_containers[c] {
+            c := input.review.object.spec.containers[_]
+        }
+        input_containers[c] {
+            c := input.review.object.spec.initContainers[_]
+        }
+
+        violation[{"msg": msg, "details": {}}] {
+            c := input_containers[_]
+            c.securityContext.privileged
+            msg := sprintf("Privileged container is not allowed: %v, securityContext: %v", [c.name, c.securityContext])
+        }

@@ -1,0 +1,28 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: image-registry
+metadata:
+  name: image-registry-constraint
+  namespace: artemis
+spec:
+  match:
+    kinds:
+      - apiGroups: ["apps"]
+        kinds: ["Deployment", "StatefulSet"]
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchLabels:
+        kubernetes.io/metadata.name: artemis
+  parameters:
+    repos:
+      - "docker.io/"
+      - "ghcr.io/"
+      - "mirror.gcr.io"
+      - "quay.io/"
+      - "oci.external-secrets.io/external-secrets/"
+      - "europe-west4-artifactregistry.gcr.io/gke-release/"
+      - "europe-west6-artifactregistry.gcr.io/gke-release/"
+      - "registry.k8s.io/"
+      - "gke.gcr.io/"
+      # Private GitLab Registry
+      - "gitlab.lrz.de:5005/container-security-wizards/artemis/"

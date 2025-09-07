@@ -1,0 +1,47 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: image-registry
+  namespace: artemis
+  annotations:
+    description: Forbids container images from unknown image registries.
+spec:
+  crd:
+    spec:
+      names:
+        kind: image-registry
+      validation:
+        openAPIV3Schema:
+          type: object
+          properties:
+            repos:
+              type: array
+              description: "List of allowed image registry prefixes. To allow all images from a registry, end the prefix with a '/'"
+              items:
+                type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8sallowedrepos
+
+        input_containers[c] {
+            c := input.review.object.spec.template.spec.containers[_]
+        }
+        input_containers[c] {
+            c := input.review.object.spec.template.spec.initContainers[_]
+        }
+        input_containers[c] {
+            c := input.review.object.spec.containers[_]
+        }
+        input_containers[c] {
+            c := input.review.object.spec.initContainers[_]
+        }
+
+        violation[{"msg": msg}] {
+          image := input_containers[_].image
+          allowed_repos := input.parameters.repos
+
+          not strings.any_prefix_match(image, allowed_repos)
+
+          msg := sprintf("image '%v' comes from a disallowed registry; allowed registries are: %v", [image, allowed_repos])
+        }
